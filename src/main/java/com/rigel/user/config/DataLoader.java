@@ -20,27 +20,27 @@ public class DataLoader implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) throws Exception {
-        long count = invoiceRepo.count();
-
-        if (count == 0) {
-            Invoice inv1 = Invoice.builder()
-                    .formate("INV")
-                    .formateName("invoiceNumber")
-                    .fy("2026-2027")
-                    .lastNumber(0)
-                    .build();
-
-            Invoice inv2 = Invoice.builder()
-                    .formate("ITM")
-                    .formateName("itemCode")
-                    .fy("2026-2027")
-                    .lastNumber(0)
-                    .build();
-
-            invoiceRepo.save(inv1);
-            invoiceRepo.save(inv2);
-
-            System.out.println("Default invoice data inserted.");
-        }
+//        long count = invoiceRepo.count();
+//
+//        if (count == 0) {
+//            Invoice inv1 = Invoice.builder()
+//                    .formate("INV")
+//                    .formateName("invoiceNumber")
+//                    .fy("2026-2027")
+//                    .lastNumber(0)
+//                    .build();
+//
+//            Invoice inv2 = Invoice.builder()
+//                    .formate("ITM")
+//                    .formateName("itemCode")
+//                    .fy("2026-2027")
+//                    .lastNumber(0)
+//                    .build();
+//
+//            invoiceRepo.save(inv1);
+//            invoiceRepo.save(inv2);
+//
+//            System.out.println("Default invoice data inserted.");
+//        }
     }
 }

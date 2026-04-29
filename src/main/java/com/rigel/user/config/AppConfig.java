@@ -29,15 +29,6 @@ public class AppConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/logo/**").addResourceLocations("file:" + Constaints.LOGO_PATH);
 //		registry.addResourceHandler("/uploads/**").addResourceLocations("file:" + uploadPath + "/");
 	}
-//		registry.addResourceHandler("/images/users/**").addResourceLocations("file:SeekerApp/resources/images/users/");
-//		registry.addResourceHandler("/images/documents/**")
-//				.addResourceLocations("file:SeekerApp/resources/images/documents/");
-//		registry.addResourceHandler("/images/chatImage/**")
-//				.addResourceLocations("file:SeekerApp/resources/images/chatImage/");
-//		registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
-////		registry.addResourceHandler("/**").addResourceLocations("classpath:/keystore.p12");
-//
-//	}
 
 	@Bean
 	public ModelMapper modelMapper() {

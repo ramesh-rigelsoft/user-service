@@ -44,10 +44,10 @@ public class UserOtp implements Serializable{
 	@Column(length = 36, updatable = false, nullable = false)
 	private String id;
 	
-	@Pattern(regexp = "^[0-9]{10,10}$",message="Enter valid mobile number") 
+//	@Pattern(regexp = "^[0-9]{10,10}$",message="Enter valid mobile number") 
 	private String mobile_no;
 	
-	@NotBlank(message = "Password is mandatory")
+//	@NotBlank(message = "Password is mandatory")
 	private String otp;
 	
 	private int status;// 1-active,2-InActive,3-delete

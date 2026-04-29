@@ -173,8 +173,8 @@ public class JwtTokenUtil implements Serializable {
 
 	public String generateToken(JwtUser userDetails, HttpServletRequest request) {
 		Map<String, Object> claims = new HashMap<>();
-		claims.put(OS_INFO, TokenSecure.getOSInfo());
-		claims.put(BROWSER_INFO, TokenSecure.getBrowserInfo(request));
+//		claims.put(OS_INFO, TokenSecure.getOSInfo());
+//		claims.put(BROWSER_INFO, TokenSecure.getBrowserInfo(request));
 		return doGenerateToken(claims, userDetails);
 	}
 
@@ -285,11 +285,11 @@ public class JwtTokenUtil implements Serializable {
 	}
 
 	private Date calculateExpirationDate(Date createdDate) {
-		return new Date(createdDate.getTime() + expiration * 1000);
+		return new Date(createdDate.getTime() + expiration );
 	}
 
 	private Date calculateExpirationDates(Date createdDate, int expiration) {
-		return new Date(createdDate.getTime() + expiration * 1000 * 60 * 60);
+		return new Date(createdDate.getTime() + expiration);
 	}
 
 	// utility
