@@ -49,25 +49,43 @@ public class AppConfig implements WebMvcConfigurer {
 		registry.addInterceptor(headersInterceptors);
 	}
 
+//	@Bean
+//	public JavaMailSender javaMailService() {
+//		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+//		javaMailSender.setHost("smtp.gmail.com");
+//		javaMailSender.setPort(587);
+//		javaMailSender.setPassword("holtediqjrtthrfu");
+//		javaMailSender.setUsername("rameshkumar13111@gmail.com");
+//		javaMailSender.setJavaMailProperties(getMailProperties());
+//		return javaMailSender;
+//	}
+//
+//	private Properties getMailProperties() {
+//		Properties properties = new Properties();
+//		properties.setProperty("mail.smtp.auth", "true");
+//		properties.setProperty("mail.smtp.starttls.enable", "true");
+//		properties.setProperty("mail.smtp.host", "smtp.gmail.com");
+//		properties.setProperty("mail.smtp.port", "25");
+//		properties.setProperty("mail.transport.protocol", "smtp");
+//		properties.setProperty("mail.debug", "false");
+//		return properties;
+//	}
+	
 	@Bean
 	public JavaMailSender javaMailService() {
-		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-		javaMailSender.setHost("smtp.gmail.com");
-		javaMailSender.setPort(587);
-		javaMailSender.setPassword("holtediqjrtthrfu");
-		javaMailSender.setUsername("rameshkumar13111@gmail.com");
-		javaMailSender.setJavaMailProperties(getMailProperties());
-		return javaMailSender;
-	}
+	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-	private Properties getMailProperties() {
-		Properties properties = new Properties();
-		properties.setProperty("mail.smtp.auth", "true");
-		properties.setProperty("mail.smtp.starttls.enable", "true");
-		properties.setProperty("mail.smtp.host", "smtp.gmail.com");
-		properties.setProperty("mail.smtp.port", "25");
-		properties.setProperty("mail.transport.protocol", "smtp");
-		properties.setProperty("mail.debug", "false");
-		return properties;
+	    mailSender.setHost("smtp.gmail.com");
+	    mailSender.setPort(587);
+	    mailSender.setUsername("rameshjavadeveloper.sb@gmail.com");
+	    mailSender.setPassword("zwhw uamy zuxj bayb");
+
+	    Properties props = mailSender.getJavaMailProperties();
+	    props.put("mail.transport.protocol", "smtp");
+	    props.put("mail.smtp.auth", "true");
+	    props.put("mail.smtp.starttls.enable", "true");
+	    props.put("mail.debug", "false");
+
+	    return mailSender;
 	}
 }

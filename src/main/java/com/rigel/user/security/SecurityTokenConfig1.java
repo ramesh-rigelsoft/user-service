@@ -1,17 +1,15 @@
-// spring boot 3 ka security config//
 package com.rigel.user.security;
 
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -19,156 +17,105 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.rigel.user.util.AppUtill;
-
-import org.springframework.http.HttpMethod;
-
-//import com.app.todoapp.util.CryptoAES128;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true) // Boot 3.x
+@EnableMethodSecurity
 public class SecurityTokenConfig1 {
 
-	private boolean isRoleSecure = false;
+    @Autowired
+    private JwtConfig jwtConfig;
 
-	@Autowired
-	private JwtConfig jwtConfig;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
-//	@Autowired
-//	private CryptoAES128 cryptoAES128;
+    @Autowired
+    private UserDetailService userDetailService;
 
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-	@Value("${security.jwt.header}")
-	private String tokenHeader;
+        http
+            // ❌ CSRF disable (API)
+            .csrf(csrf -> csrf.disable())
 
-	@Value("${jwt.route.authentication.path}")
-	private String authenticationPath;
+            // ❌ no session
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-	@Autowired
-	private UserDetailService userDetailService;
+            // ❌ unauthorized handler
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((req, res, e) ->
+                    res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
 
-	// Swagger + actuator + public endpoints
-//	private static final String[] AUTH_WHITELIST = { "/authenticate", "/actuator/**", "/v2/api-docs",
-//			"/api/todoTask/test/**", "/api-docs/**", "/api/actuator/**", "/swagger-ui/**", "/swagger-resources/**",
-//			"/swagger-ui.html", "/v3/api-docs/**", "/webjars/**" };
-	
-	private static final String[] AUTH_WHITELIST = {
-		    "/authenticate",
-		    "/actuator/**",
-		    "/v2/api-docs",
-		    "/api/todoTask/test/**",
-		    "/api-docs/**",
-		    "/api/actuator/**",
-		    "/swagger-ui/**",
-		    "/swagger-resources/**",
-		    "/swagger-ui.html",
-		    "/v3/api-docs/**",
-		    "/webjars/**"
-		};
+            // ✅ AUTH RULES
+            .authorizeHttpRequests(auth -> auth
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				// disable csrf for APIs
-				.csrf(csrf -> csrf.disable())
+                // ✅ PUBLIC APIs
+                .requestMatchers(
+                    "/api/user/signup/**",
+                    "/api/user/login/**",
+                    "/authenticate"
+                ).permitAll()
 
-				// handle unauthorized
-				.exceptionHandling(ex -> ex
-						.authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
+                // ✅ STATIC
+                .requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/static/**",
+                    "/favicon.ico"
+                ).permitAll()
 
-				// add JWT filter
-				.addFilterAfter(
-						new JwtTokenAuthenticationFilter(jwtConfig, userDetailService, jwtTokenUtil),//, cryptoAES128),
-						UsernamePasswordAuthenticationFilter.class)
+                // ✅ SWAGGER / ACTUATOR
+                .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/actuator/**"
+                ).permitAll()
 
-				// authorize requests
-				.authorizeHttpRequests(auth -> auth.requestMatchers(AUTH_WHITELIST).permitAll()
+                // ✅ OPTIONS (CORS preflight)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-						
-						.requestMatchers(HttpMethod.GET, "/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/api/**").permitAll()
-						
-//						.requestMatchers(HttpMethod.POST, "/api/user/signup/**", "/api/user/login/**").permitAll()
-//						.requestMatchers(AppUtill.getUrlRole()).hasAnyAuthority(AppUtill.getAllRole()).anyRequest()
-						.requestMatchers(
-					            "/",
-					            "/index.html",
-					            "/static/**",
-					            "/favicon.ico"
-					        ).permitAll()
-					        .anyRequest() //.authenticated()
-						.authenticated())
+                // 🔐 बाकी सब secure
+                .anyRequest().authenticated()
+            )
 
-				// use stateless sessions
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // ✅ JWT FILTER
+            .addFilterBefore(
+                new JwtTokenAuthenticationFilter(jwtConfig, userDetailService, jwtTokenUtil),
+                UsernamePasswordAuthenticationFilter.class
+            )
 
-				// basic auth enabled (optional if JWT only)
-				.httpBasic(Customizer.withDefaults());
+            // ✅ CORS
+            .cors(Customizer.withDefaults())
 
-		// security headers
-		http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()).cacheControl(Customizer.withDefaults()));
+            // ❌ basic auth optional (remove if not needed)
+            .httpBasic(Customizer.withDefaults());
 
-		http.cors(Customizer.withDefaults());
+        return http.build();
+    }
 
-		return http.build();
-	}
-	
-	 @Bean
-	    public WebSecurityCustomizer webSecurityCustomizer(){
-	    	return (web) -> web.ignoring()
-	            .requestMatchers(
-	                HttpMethod.POST,
-	                authenticationPath)
-	            .and()
-	            .ignoring()
-	            .requestMatchers(
-	                HttpMethod.GET,"/","/*.html",
-	                "/favicon.ico",
-	                "/**/*.html",
-	                "/swagger-ui.html#/",
-//	                "/demouser/v2/api-docs/",
-	                "/v2/api-docs/",
-	                "/**/*.jsp",
-	                "/**/*.css",
-	                "/**/*.js",
-	                "/**/*.png",
-	                "/**/*.jpg",
-	                "/**/*.jpeg",
-	                "/**/*.JPG",
-	                "/**/*.gif",
-	                "/**/*.map",
-	                "/fonts/**",
-	                "/js/**",
-	                "css/**",
-	                "/images/**",
-	                "/frontend/app/static/**"
-	            ).and()
-	            .ignoring()
-	            .requestMatchers("/h2-console/**");
-	    }
-	 
-	 @Bean
-	    public CorsConfigurationSource corsConfigurationSource() {
-	        final CorsConfiguration configuration = new CorsConfiguration();
-	        configuration.setAllowCredentials(true);
-//	        configuration.setAllowedOrigins(Arrays.asList("*"));
-	        configuration.addAllowedOrigin("http://localhost:8091");
-	        configuration.setAllowedMethods(Arrays.asList("HEAD",
-	                "GET", "POST", "PUT", "DELETE", "PATCH"));
-	        // setAllowCredentials(true) is important, otherwise:
-	        // The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
-	        
-	        // setAllowedHeaders is important! Without it, OPTIONS preflight request
-	        // will fail with 403 Invalid CORS request
-	        configuration.setAllowedHeaders(Arrays.asList("Authorization","filter", "Cache-Control", "Content-Type"));
-	        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	        source.registerCorsConfiguration("/**", configuration);
-	        return source;
-	    }
-	 
-	 
+    // ✅ CORS CONFIG
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(Arrays.asList("http://localhost:8091"));
+
+        config.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
+
+        config.setAllowedHeaders(Arrays.asList(
+                "Authorization", "Content-Type"
+        ));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
 }
