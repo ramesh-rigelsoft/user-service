@@ -76,4 +76,61 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    
+    public void sendOtpEmail(String toEmail, String otp) throws Exception {
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(toEmail);
+        helper.setSubject("Your OTP Code");
+
+        String htmlContent =
+                "<html>" +
+                "<body style='margin:0; padding:0; background-color:#f4f6f9; font-family:Arial, sans-serif;'>" +
+
+                "<div style='max-width:600px; margin:30px auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);'>" +
+
+                // Header
+                "<div style='background:linear-gradient(135deg,#0d6efd,#6610f2); padding:20px; text-align:center; color:white;'>" +
+                "<h1 style='margin:0;'>Rigel Family</h1>" +
+                "</div>" +
+
+                // Body
+                "<div style='padding:30px; color:#333;'>" +
+
+                "<h2 style='color:#0d6efd;'>OTP Verification</h2>" +
+
+                "<p style='font-size:15px; line-height:1.6;'>" +
+                "Use the following One Time Password (OTP) to complete your verification:" +
+                "</p>" +
+
+                // OTP BOX
+                "<div style='text-align:center; margin:25px 0;'>" +
+                "<span style='display:inline-block; font-size:28px; letter-spacing:5px; font-weight:bold; " +
+                "background:#f8f9fa; padding:15px 25px; border-radius:8px; color:#0d6efd;'>" +
+                otp +
+                "</span>" +
+                "</div>" +
+
+                "<p style='font-size:14px; color:#555;'>" +
+                "⏳ This OTP is valid for <b>5 minutes</b>.<br/>" +
+                "🔒 Do not share this OTP with anyone." +
+                "</p>" +
+
+                "</div>" +
+
+                // Footer
+                "<div style='background:#f1f1f1; text-align:center; padding:15px; font-size:13px; color:#666;'>" +
+                "Thanks & Regards<br/><b>Rigel Team</b>" +
+                "</div>" +
+
+                "</div>" +
+                "</body>" +
+                "</html>";
+
+        helper.setText(htmlContent, true);
+
+        mailSender.send(message);
+    }
 }

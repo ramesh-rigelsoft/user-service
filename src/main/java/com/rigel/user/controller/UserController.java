@@ -276,6 +276,7 @@ public class UserController {
 		}else {
 			
 			try {
+//				emailService.sendOtpEmail("info@rigelautomation.com", "45678");
 				emailService.sendHtmlEmail("rameshkumar12111@gmail.com", user.getEmail_id(), login.getPassword());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
