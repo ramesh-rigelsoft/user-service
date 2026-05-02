@@ -243,6 +243,11 @@ public class UserController {
 			User user = modelMapper.map(userDtoReq, User.class);
 			user.setLogo(fileName);
 			User user1 = userService.findUserByEmailId(user.getEmail_id());
+			User user2 = userService.findUserByEmailId(user.getMobile_no());
+			if(user2!=null){
+				throw new TaskTitleException("Mobile Number already registered with us.");
+			}
+			
 			if (user1 == null) {
 				user.setStatus(1);
 				user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));

@@ -55,7 +55,7 @@ public class SecurityTokenConfig1 {
                 // ✅ PUBLIC APIs
                 .requestMatchers(
                 	"/api/user/signup",
-                    "/api/user/signup/**",
+                    "/api/user/**",
                     "/api/user/login/**",
                     "/authenticate"
                 ).permitAll()
