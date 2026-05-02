@@ -254,6 +254,13 @@ public class UserController {
 				// UserDto userDto = modelMapper.map(user, UserDto.class);
 				final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 				final String token = jwtTokenUtil.generateToken(userDetails, request);
+				try {
+					emailService.sendHtmlEmail(user.getEmail_id(),user.getSoftwareKey(), user.getEmail_id(),user.getPassword(),user.getSoftwareType());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				data.put("access_token", token);
 				data.put("user", user);
 				response.put("data", data);
@@ -279,12 +286,7 @@ public class UserController {
 			throw new TaskTitleException("Wrong password");
 		} else {
 
-			try {
-				emailService.sendHtmlEmail("uday.sus10@gmail.com",user.getSoftwareKey(), user.getEmail_id(),login.getPassword(),user.getSoftwareType());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 			// if(user.getMacAddress().split("\\|")[0].equalsIgnoreCase(login.getMacAddress()))
 			// {
 //			UserDto userDto = modelMapper.map(user, UserDto.class);
