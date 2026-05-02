@@ -17,14 +17,14 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public void sendHtmlEmail(String toEmail,String username,String password) throws Exception {
+    public void sendHtmlEmail(String toEmail,String licenceKey,String username,String password,String software) throws Exception {
 
         MimeMessage message = mailSender.createMimeMessage();
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setTo(toEmail);
-        helper.setSubject("Welcome Email");
+        helper.setSubject("Rigel Team");
 
         // 👇 HTML CONTENT HERE
         String htmlContent =
@@ -35,7 +35,7 @@ public class EmailService {
 
                 // Header
                 "<div style='background:linear-gradient(135deg,#0d6efd,#6610f2); padding:20px; text-align:center; color:white;'>" +
-                "<h1 style='margin:0;'>Rigel Family</h1>" +
+                "<h1 style='margin:0;'>"+software+"</h1>" +
                 "</div>" +
 
                 // Body
@@ -52,6 +52,7 @@ public class EmailService {
                 "<p><b>Your Login Details:</b></p>" +
 
                 "<p style='background:#f8f9fa; padding:10px; border-radius:5px;'>" +
+                "&#128100; Licence key: <b>" + licenceKey + "</b><br/>" +
                 "&#128100; Username: <b>" + username + "</b><br/>" +
                 "&#128273; Password: <b>" + password + "</b>"+
                 "</p>" +
@@ -77,13 +78,13 @@ public class EmailService {
         mailSender.send(message);
     }
     
-    public void sendOtpEmail(String toEmail, String otp) throws Exception {
+    public void sendOtpEmail(String toEmail, String otp,String software) throws Exception {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setTo(toEmail);
-        helper.setSubject("Your OTP Code");
+        helper.setSubject(software+" OTP");
 
         String htmlContent =
                 "<html>" +
@@ -93,7 +94,7 @@ public class EmailService {
 
                 // Header
                 "<div style='background:linear-gradient(135deg,#0d6efd,#6610f2); padding:20px; text-align:center; color:white;'>" +
-                "<h1 style='margin:0;'>Rigel Family</h1>" +
+                "<h1 style='margin:0;'>Welcome to "+software+"</h1>" +
                 "</div>" +
 
                 // Body
@@ -114,7 +115,7 @@ public class EmailService {
                 "</div>" +
 
                 "<p style='font-size:14px; color:#555;'>" +
-                "⏳ This OTP is valid for <b>5 minutes</b>.<br/>" +
+                "⏳ This OTP is valid for <b>15 minutes</b>.<br/>" +
                 "🔒 Do not share this OTP with anyone." +
                 "</p>" +
 

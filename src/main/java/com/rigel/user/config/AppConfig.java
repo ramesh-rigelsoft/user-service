@@ -49,41 +49,41 @@ public class AppConfig implements WebMvcConfigurer {
 		registry.addInterceptor(headersInterceptors);
 	}
 	
-//	@Bean
-//	public JavaMailSender javaMailService() {
-//	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-//
-//	    mailSender.setHost("smtp.gmail.com");
-//	    mailSender.setPort(587);
-////	    mailSender.setUsername("rameshjavadeveloper.sb@gmail.com");
-////	    mailSender.setPassword("zwhw uamy zuxj bayb");
-//	    mailSender.setUsername("info@rigelautomation.com");
-//	    mailSender.setPassword("Rigel@111@@");
-//
-//	    Properties props = mailSender.getJavaMailProperties();
-//	    props.put("mail.transport.protocol", "smtp");
-//	    props.put("mail.smtp.auth", "true");
-//	    props.put("mail.smtp.starttls.enable", "true");
-//	    props.put("mail.debug", "false");
-//
-//	    return mailSender;
-//	}
-	
 	@Bean
 	public JavaMailSender javaMailService() {
 	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-	    mailSender.setHost("mail.rigelautomation.com");
-	    mailSender.setPort(465);
 
-	    mailSender.setUsername("info@rigelautomation.com");
-	    mailSender.setPassword("Rigel@2026@@");
+	    mailSender.setHost("smtp.gmail.com");
+	    mailSender.setPort(587);
+	    mailSender.setUsername("rameshjavadeveloper.sb@gmail.com");
+	    mailSender.setPassword("zwhw uamy zuxj bayb");
+//	    mailSender.setUsername("info@rigelautomation.com");
+//	    mailSender.setPassword("Rigel@111@@");
 
 	    Properties props = mailSender.getJavaMailProperties();
 	    props.put("mail.transport.protocol", "smtp");
 	    props.put("mail.smtp.auth", "true");
-	    props.put("mail.smtp.ssl.enable", "true");
-	    props.put("mail.smtp.ssl.trust", "mail.rigelautomation.com");
+	    props.put("mail.smtp.starttls.enable", "true");
+	    props.put("mail.debug", "false");
 
 	    return mailSender;
 	}
+	
+//	@Bean
+//	public JavaMailSender javaMailService() {
+//	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+//	    mailSender.setHost("mail.rigelautomation.com");
+//	    mailSender.setPort(465);
+//
+//	    mailSender.setUsername("info@rigelautomation.com");
+//	    mailSender.setPassword("Rigel@2026@@");
+//
+//	    Properties props = mailSender.getJavaMailProperties();
+//	    props.put("mail.transport.protocol", "smtp");
+//	    props.put("mail.smtp.auth", "true");
+//	    props.put("mail.smtp.ssl.enable", "true");
+//	    props.put("mail.smtp.ssl.trust", "mail.rigelautomation.com");
+//
+//	    return mailSender;
+//	}
 }

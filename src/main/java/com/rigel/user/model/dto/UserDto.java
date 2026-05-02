@@ -55,7 +55,7 @@ public class UserDto {
 	
     // ================= COMPANY INFO =================
 	private String shopType;
-	
+	private String softwareType;
     private String companyName;
     private String companyLogo;
 

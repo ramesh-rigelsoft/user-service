@@ -46,6 +46,8 @@ public class UserOtp implements Serializable{
 	
 //	@Pattern(regexp = "^[0-9]{10,10}$",message="Enter valid mobile number") 
 	private String mobile_no;
+
+	private String emailId;
 	
 //	@NotBlank(message = "Password is mandatory")
 	private String otp;
@@ -55,7 +57,7 @@ public class UserOtp implements Serializable{
 	
 	private LocalDateTime expaire_at;
 	
-	private String applicationType;
+	private String softwareType;
 	
 	private int userId;
 	

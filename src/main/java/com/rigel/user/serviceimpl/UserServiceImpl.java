@@ -32,7 +32,7 @@ import com.rigel.user.service.IUserService;
 import lombok.experimental.StandardException;
 
 @Service
-@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
+//@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
 public class UserServiceImpl implements IUserService {
 
 	private volatile String em = null;
@@ -42,6 +42,9 @@ public class UserServiceImpl implements IUserService {
 	
 	@Autowired
 	private JavaMailSender emailSender;
+	
+	@Autowired
+	private EmailService emailService;
 
 	@Autowired
 	private SpringTemplateEngine templateEngine;
@@ -132,6 +135,13 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public UserOtp saveUserOTP(UserOtp otp) {
 		int num = (int)(Math.random() * 900000) + 100000;
+		try {
+			emailService.sendOtpEmail(otp.getEmailId(), num+"",otp.getSoftwareType());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		otp.setOtp(String.valueOf(num));
 		otp.setCreated_at(LocalDateTime.now());
 		otp.setExpaire_at(LocalDateTime.now().plusMinutes(15));

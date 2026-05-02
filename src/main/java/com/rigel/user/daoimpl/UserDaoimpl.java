@@ -39,10 +39,10 @@ public class UserDaoimpl implements IUserDao {
 	                .getSingleResult();
 
 	    } catch (NoResultException e) {
-	    	e.printStackTrace();
+//	    	e.printStackTrace();
 	        return null;
 	    } catch (Exception e) {
-	        e.printStackTrace(); // optional logging
+//	        e.printStackTrace(); // optional logging
 	        return null;
 	    }
 	}

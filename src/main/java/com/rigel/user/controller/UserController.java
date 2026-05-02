@@ -69,7 +69,7 @@ public class UserController {
 
 	@Autowired
 	private IUserService userService;
-	
+
 	@Autowired
 	private EmailService emailService;
 
@@ -128,7 +128,9 @@ public class UserController {
 			User user = userService.findUserByEmailId(username);
 			if (user != null) {
 				UserOtp userOtp = userService.findUserOtpByMobileNo(username);
-				if (userOtp.getOtp().equals(resetPassword.getOtp())) {
+				LocalDateTime currentTime = LocalDateTime.now();
+
+				if (userOtp.getOtp().equals(resetPassword.getOtp()) && userOtp.getExpaire_at().isAfter(currentTime)) {
 					if (LocalDateTime.now().isAfter(userOtp.getCreated_at())) {
 						user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
 						user = userService.saveUser(user);
@@ -169,7 +171,7 @@ public class UserController {
 			String username = resetPassword.getMobile_no();
 			User user = userService.findUserByEmailId(username);
 			if (user != null) {
-				UserOtp userOtp = UserOtp.builder().applicationType("einventory").mobile_no(username).build();
+				UserOtp userOtp = UserOtp.builder().emailId(user.getEmail_id()).softwareType(user.getSoftwareType()).mobile_no(username).build();
 				userService.saveUserOTP(userOtp);
 				data.put("access_token", "sdfghjk");
 				data.put("user", userOtp);
@@ -196,7 +198,8 @@ public class UserController {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
 			System.out.println("userDtoReq.getLogo()" + userDtoReq.getLogo());
-			String fileName = userDtoReq.getLogo() == null ? null : UploadFileUtlity.uploadFiles(userDtoReq.getLogo(),"logo",null);
+			String fileName = userDtoReq.getLogo() == null ? null
+					: UploadFileUtlity.uploadFiles(userDtoReq.getLogo(), "logo", null);
 			User user = modelMapper.map(userDtoReq, User.class);
 			user.setLogo(fileName);
 			User user1 = userService.findUserByEmailId(user.getEmail_id());
@@ -235,7 +238,8 @@ public class UserController {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
 			System.out.println("userDtoReq.getLogo()" + userDtoReq.getLogo());
-			String fileName = userDtoReq.getLogo() == null ? null : UploadFileUtlity.uploadFiles(userDtoReq.getLogo(),"logo",null);
+			String fileName = userDtoReq.getLogo() == null ? null
+					: UploadFileUtlity.uploadFiles(userDtoReq.getLogo(), "logo", null);
 			User user = modelMapper.map(userDtoReq, User.class);
 			user.setLogo(fileName);
 			User user1 = userService.findUserByEmailId(user.getEmail_id());
@@ -272,17 +276,17 @@ public class UserController {
 		if (user == null) {
 			throw new TaskTitleNotFound("Email id not existing with us.");
 		} else if (!(User.PASSWORD_ENCODER.matches(login.getPassword(), user.getPassword()))) {
-		   throw new TaskTitleException("Wrong password");
-		}else {
-			
+			throw new TaskTitleException("Wrong password");
+		} else {
+
 			try {
-//				emailService.sendOtpEmail("info@rigelautomation.com", "45678");
-				emailService.sendHtmlEmail("rameshkumar12111@gmail.com", user.getEmail_id(), login.getPassword());
+				emailService.sendHtmlEmail("uday.sus10@gmail.com",user.getSoftwareKey(), user.getEmail_id(),login.getPassword(),user.getSoftwareType());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			//if(user.getMacAddress().split("\\|")[0].equalsIgnoreCase(login.getMacAddress())) {
+			// if(user.getMacAddress().split("\\|")[0].equalsIgnoreCase(login.getMacAddress()))
+			// {
 //			UserDto userDto = modelMapper.map(user, UserDto.class);
 			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 			final String token = jwtTokenUtil.generateToken(userDetails, request);
@@ -300,8 +304,8 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "key/verify", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> verifyKey(@RequestBody(required = true) @Valid VerifyKeyRequest verifyKeyRequest,
-			HttpServletRequest request) {
+	public ResponseEntity<Map<String, Object>> verifyKey(
+			@RequestBody(required = true) @Valid VerifyKeyRequest verifyKeyRequest, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
 		User user = userService.findUserByEmailId(verifyKeyRequest.getUsername());
@@ -310,9 +314,11 @@ public class UserController {
 			response.put("code", "400");
 			response.put("message", "Email id not existing with us.");
 			return new ResponseEntity<>(response, HttpStatus.BAD_GATEWAY);
-	    } else if (user.getSoftwareKey().equalsIgnoreCase(verifyKeyRequest.getSoftwareKey())){
+		} else if (user.getSoftwareKey().equalsIgnoreCase(verifyKeyRequest.getSoftwareKey())) {
 //			user.setSoftwareInstalationCount(user.getSoftwareInstalationCount()+1);
-			user.setMacAddress(verifyKeyRequest.getMacAddress()+user.getMacAddress()!=null?("|"+user.getMacAddress()):"");
+			user.setMacAddress(
+					verifyKeyRequest.getMacAddress() + user.getMacAddress() != null ? ("|" + user.getMacAddress())
+							: "");
 			userService.saveUser(user);
 			response.put("status", "OK");
 			response.put("code", "200");
@@ -365,29 +371,25 @@ public class UserController {
 			return null;
 		}
 	}
-	
+
 	@GetMapping("/view/file")
-	public ResponseEntity<byte[]> viewFile(
-	        @RequestParam String path,
-	        @RequestParam String fileName) throws IOException {
+	public ResponseEntity<byte[]> viewFile(@RequestParam String path, @RequestParam String fileName)
+			throws IOException {
 
-	    File file = new File(UploadFileUtlity.getPath(path) + fileName);
-		System.out.println("hhhhhhhhhhhh---"+file.getAbsolutePath());     
-	    if (!file.exists()) {
-		        throw new RuntimeException("File not found");
-		     }
+		File file = new File(UploadFileUtlity.getPath(path) + fileName);
+		System.out.println("hhhhhhhhhhhh---" + file.getAbsolutePath());
+		if (!file.exists()) {
+			throw new RuntimeException("File not found");
+		}
 
-	    byte[] fileBytes = Files.readAllBytes(file.toPath());
+		byte[] fileBytes = Files.readAllBytes(file.toPath());
 
-	    String contentType = Files.probeContentType(file.toPath());
-	    if (contentType == null) {
-	        contentType = "application/octet-stream";
-	    }
+		String contentType = Files.probeContentType(file.toPath());
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
 
-	    return ResponseEntity
-	            .ok()
-	            .contentType(MediaType.parseMediaType(contentType))
-	            .header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
-	            .body(fileBytes);
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header("Content-Disposition", "inline; filename=\"" + fileName + "\"").body(fileBytes);
 	}
 }
