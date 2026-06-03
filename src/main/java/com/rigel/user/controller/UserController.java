@@ -84,6 +84,7 @@ public class UserController {
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
+	
 
 //	@Autowired
 //	private IUserLogOutIn userLogOutIn;
@@ -398,5 +399,14 @@ public class UserController {
 
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
 				.header("Content-Disposition", "inline; filename=\"" + fileName + "\"").body(fileBytes);
+	}
+	
+	@PostMapping("/checkInternet")
+	public ResponseEntity<Map<String, Object>> checkInternet() {
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("status", "OK");
+	    response.put("code", 200);
+	    response.put("message", "Success");
+	    return ResponseEntity.ok(response);
 	}
 }

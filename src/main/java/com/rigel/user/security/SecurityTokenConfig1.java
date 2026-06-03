@@ -104,7 +104,7 @@ public class SecurityTokenConfig1 {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://localhost:8091"));
 //        config.setAllowedOrigins(Arrays.asList("*"));
 
         config.setAllowedMethods(Arrays.asList(
