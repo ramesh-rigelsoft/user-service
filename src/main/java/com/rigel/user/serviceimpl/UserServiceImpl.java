@@ -27,6 +27,7 @@ import com.rigel.user.dao.IUserDao;
 import com.rigel.user.model.Mail;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
+import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.service.IUserService;
 
 import lombok.experimental.StandardException;
@@ -63,8 +64,8 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public User findUserByEmailId(String email) {
-		return userDao.findUserByEmailId(email);
+	public User findUserByEmailId(String email,int existingId) {
+		return userDao.findUserByEmailId(email,existingId);
 	}
 
 	@Override
@@ -152,6 +153,11 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public UserOtp findUserOtpByMobileNo(String mobileNo) {
 		return userDao.findUserOtpByMobileNo(mobileNo);
+	}
+
+	@Override
+	public List<User> findUsers(SearchCriteria searcCriteria) {
+		return userDao.findUsers(searcCriteria);
 	}
 
 }

@@ -1,10 +1,9 @@
-package com.rigel.user.model;
+package com.rigel.user.model.dto;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
@@ -12,11 +11,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
-@Table(name = "roles")
 @Getter
 @Setter
-public class Roles implements Serializable {
+public class RolesDto {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,13 +27,4 @@ public class Roles implements Serializable {
     @Column(name = "role_name", unique = true, nullable = false)
     private String roleName;
     
-    @OneToMany(mappedBy = "roles", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JsonManagedReference
-	private Set<RolesPagePermision> rolesPagePermision = new HashSet<>();
-    
-	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-	@JoinColumn(name="user")
-	@JsonBackReference
-	private User user;
-
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.rigel.user.model.Mail;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
+import com.rigel.user.model.dto.SearchCriteria;
 
 public interface IUserService {
 	
@@ -13,13 +14,14 @@ public interface IUserService {
 	
 	public User findUserById(int id);
 	
-	public User findUserByEmailId(String email);
+	public User findUserByEmailId(String email,int existingId);
 	
 	public Map<String,Object> sendEmailToAll(Mail emailDetails);
 	
 	public UserOtp saveUserOTP(UserOtp otp);
 
 	public UserOtp findUserOtpByMobileNo(String mobileNo);
-
+	
+	public List<User> findUsers(SearchCriteria searcCriteria);
 	
 }

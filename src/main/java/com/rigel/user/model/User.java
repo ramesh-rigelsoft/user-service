@@ -3,15 +3,17 @@ package com.rigel.user.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,10 +23,12 @@ import lombok.Setter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+
+//@Builder
+//@NoArgsConstructor
+//@AllArgsConstructor
 @Setter
 @Getter
 @Entity
@@ -64,7 +68,6 @@ public class User implements Serializable{
 	private int status;// 1-active,2-InActive,3-delete
 	private Timestamp created_at;
 //	private List<String> role;// 1- admin,2-user
-	private String role;// 1- admin,2-user
 	
 	private String gender;
 	private Date lastPasswordResetDate;
@@ -97,6 +100,12 @@ public class User implements Serializable{
     
     private String softwareKey;
     private String macAddress;
+    
+    private int ownerId;
+    
+    @OneToMany(mappedBy = "roles", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private Set<Roles> roles = new HashSet<>();
     
 	public static PasswordEncoder getPasswordEncoder() {
 		return PASSWORD_ENCODER;

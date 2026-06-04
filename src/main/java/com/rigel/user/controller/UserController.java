@@ -5,9 +5,10 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import java.io.*;
 import java.nio.file.Files;
 
@@ -44,6 +45,7 @@ import com.rigel.user.model.LoginActivity;
 import com.rigel.user.model.LoginDetails;
 import com.rigel.user.model.LoginRequest;
 import com.rigel.user.model.Mail;
+import com.rigel.user.model.Roles;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
 import com.rigel.user.model.VerifyKeyRequest;
@@ -126,7 +128,7 @@ public class UserController {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
 			String username = resetPassword.getMobile_no();
-			User user = userService.findUserByEmailId(username);
+			User user = userService.findUserByEmailId(username,0);
 			if (user != null) {
 				UserOtp userOtp = userService.findUserOtpByMobileNo(username);
 				LocalDateTime currentTime = LocalDateTime.now();
@@ -170,7 +172,7 @@ public class UserController {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
 			String username = resetPassword.getMobile_no();
-			User user = userService.findUserByEmailId(username);
+			User user = userService.findUserByEmailId(username,0);
 			if (user != null) {
 				UserOtp userOtp = UserOtp.builder().emailId(user.getEmail_id()).softwareType(user.getSoftwareType()).mobile_no(username).build();
 				userService.saveUserOTP(userOtp);
@@ -187,45 +189,6 @@ public class UserController {
 		}
 	}
 
-	@PostMapping(value = "update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<Map<String, Object>> update(@ModelAttribute @Valid UserDto userDtoReq, BindingResult result,
-			HttpServletRequest request) {
-		Map<String, Object> response = new HashMap<>();
-		Map<String, Object> data = new HashMap<>();
-
-		if (userDtoReq == null) {
-			throw new BadGatewayRequest("Invalid Request");
-		} else if (result.hasFieldErrors()) {
-			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
-		} else {
-			System.out.println("userDtoReq.getLogo()" + userDtoReq.getLogo());
-			String fileName = userDtoReq.getLogo() == null ? null
-					: UploadFileUtlity.uploadFiles(userDtoReq.getLogo(), "logo", null);
-			User user = modelMapper.map(userDtoReq, User.class);
-			user.setLogo(fileName);
-			User user1 = userService.findUserByEmailId(user.getEmail_id());
-			if (user1 == null) {
-				user.setStatus(1);
-				user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
-				user.setCreated_at(new Timestamp(new Date().getTime()));
-				user.setRole("user");
-				user.setLogo(fileName);
-				user = userService.saveUser(user);
-				UserDto userDto = modelMapper.map(user, UserDto.class);
-				final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
-				final String token = jwtTokenUtil.generateToken(userDetails, request);
-				data.put("access_token", token);
-				data.put("user", userDto);
-				response.put("data", data);
-				response.put("status", "OK");
-				response.put("code", "200");
-				response.put("message", "Your account has been created successfully.");
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			} else {
-				throw new TaskTitleException("Email id already registered with us.");
-			}
-		}
-	}
 
 	@PostMapping(value = "signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Map<String, Object>> signup(@ModelAttribute @Valid UserDto userDtoReq, BindingResult result,
@@ -243,18 +206,23 @@ public class UserController {
 					: UploadFileUtlity.uploadFiles(userDtoReq.getLogo(), "logo", null);
 			User user = modelMapper.map(userDtoReq, User.class);
 			user.setLogo(fileName);
-			User user1 = userService.findUserByEmailId(user.getEmail_id());
-			User user2 = userService.findUserByEmailId(user.getMobile_no());
+			User user1 = userService.findUserByEmailId(user.getEmail_id(),userDtoReq.getId());
+			User user2 = userService.findUserByEmailId(user.getMobile_no(),userDtoReq.getId());
 			if(user2!=null){
 				throw new TaskTitleException("Mobile Number already registered with us.");
 			}
 			
 			if (user1 == null) {
+				Set<Roles> rolesSet=new HashSet<>();
+				Roles roles=new Roles();
+				roles.setRole("admin");
+				roles.setRoleName("supper User");
+				rolesSet.add(roles);
 				user.setStatus(1);
 				user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
 				user.setCreated_at(new Timestamp(new Date().getTime()));
-				user.setRole("user");
 				user.setLogo(fileName);
+				user.setRoles(rolesSet);
 				user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
 				user = userService.saveUser(user);
 				// UserDto userDto = modelMapper.map(user, UserDto.class);
@@ -285,7 +253,7 @@ public class UserController {
 			HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
-		User user = userService.findUserByEmailId(login.getUsername());
+		User user = userService.findUserByEmailId(login.getUsername(),0);
 		if (user == null) {
 			throw new TaskTitleNotFound("Email id not existing with us.");
 		} else if (!(User.PASSWORD_ENCODER.matches(login.getPassword(), user.getPassword()))) {
@@ -316,7 +284,7 @@ public class UserController {
 			@RequestBody(required = true) @Valid VerifyKeyRequest verifyKeyRequest, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
-		User user = userService.findUserByEmailId(verifyKeyRequest.getUsername());
+		User user = userService.findUserByEmailId(verifyKeyRequest.getUsername(),0);
 		if (user == null) {
 			response.put("status", "BAD_GATEWAY");
 			response.put("code", "400");
@@ -354,6 +322,8 @@ public class UserController {
 //					return new ResponseEntity<>(response, HttpStatus.OK);
 //			
 //	    }
+	
+	
 
 	@RequestMapping(value = "testapi", method = RequestMethod.GET)
 	public String d() {

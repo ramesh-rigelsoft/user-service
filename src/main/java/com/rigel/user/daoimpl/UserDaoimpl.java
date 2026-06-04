@@ -3,6 +3,8 @@ package com.rigel.user.daoimpl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.rigel.user.dao.IUserDao;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
+import com.rigel.user.model.dto.SearchCriteria;
 
 @Repository
 @Transactional
@@ -29,14 +32,25 @@ public class UserDaoimpl implements IUserDao {
 	}
 
 	@Override
-	public User findUserByEmailId(String username) {
+	public User findUserByEmailId(String username,int existingId) {
 	    try {
-	        return entityManager
+	    	if(existingId==0) {
+	          return entityManager
 	                .createQuery(
 	                        "SELECT u FROM User u WHERE u.email_id = :username OR u.mobile_no = :username",
 	                        User.class)
 	                .setParameter("username", username)
 	                .getSingleResult();
+	    	}else {
+	    	  return entityManager
+	    		 .createQuery(
+	                        "SELECT u FROM User u WHERE u.id !=userId AND (u.email_id = :username OR u.mobile_no = :username)",
+	                        User.class)
+	                .setParameter("userId", existingId)
+	                .setParameter("username", username)
+	                .getSingleResult();
+	    	}
+	    	
 
 	    } catch (NoResultException e) {
 //	    	e.printStackTrace();
@@ -69,6 +83,12 @@ public class UserDaoimpl implements IUserDao {
 	        e.printStackTrace(); // optional logging
 	        return null;
 	    }
+	}
+
+	@Override
+	public List<User> findUsers(SearchCriteria searcCriteria) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
