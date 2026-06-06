@@ -5,12 +5,19 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Builder
 public class RolesPagePermisionDto {
 
 	private Long id;
@@ -32,6 +39,8 @@ public class RolesPagePermisionDto {
  	@Column(name = "can_delete")
  	private boolean canDelete;
  	
- 	private PagesDto pages;
-    private RolesDto roles;
+ 	private int ownerId;
+ 	
+ 	private PagesDto pageId;
+    private RolesDto roleId;
 }

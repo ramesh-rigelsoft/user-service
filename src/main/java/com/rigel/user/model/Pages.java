@@ -28,10 +28,13 @@ public class Pages implements Serializable {
     
     @Column(name = "page_name", nullable = false)
     private String pageName;
+    
     private String description;
     
-	@OneToMany(mappedBy = "pages", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JsonManagedReference
+    private boolean status;
+    
+	@OneToMany(mappedBy = "pageId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference(value = "pageId")
 	private Set<RolesPagePermision> rolesPagePermision = new HashSet<>();
 
 }

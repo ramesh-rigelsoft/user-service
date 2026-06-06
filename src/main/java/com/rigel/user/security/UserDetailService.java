@@ -31,19 +31,16 @@ public class UserDetailService implements UserDetailsService {
 //		System.out.println("User name >>> "+user.getId());
         if (user!= null) {
         	return new JwtUser(user.getId(), user.getEmail_id(),
-        			user.getPassword(), mapToGrantedAuthorities(user.getRoles()),
+        			user.getPassword(), mapToGrantedAuthorities(user.getRole()),
         			user.getStatus(), user.getLastPasswordResetDate());
           }else {
         	throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));	
         }
 	}
 	
-	 private static Set<GrantedAuthority> mapToGrantedAuthorities(Set<Roles> rolesSet) {
-		 Roles firstRole = rolesSet.stream()
-                 .findFirst()
-                 .orElse(null);
-    	Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-	    grantedAuthorities.add(new SimpleGrantedAuthority(firstRole!=null?firstRole.getRole():"NA"));
+	 private static Set<GrantedAuthority> mapToGrantedAuthorities(String roles) {
+		Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+	    grantedAuthorities.add(new SimpleGrantedAuthority(roles));
 //	    System.out.println(grantedAuthorities.contains(new SimpleGrantedAuthority("user")));
     	return grantedAuthorities;
     }

@@ -43,7 +43,7 @@ public class UserDto {
 	@Pattern(regexp = "^[0-9]{1,3}$",message="Enter valid contry code") 
 	private String country_code;
 	
-	@NotBlank(message = "Password is mandatory")
+//	@NotBlank(message = "Password is mandatory")
 	private String password;
 	
 	private int status;// 1-active,2-InActive,3-delete

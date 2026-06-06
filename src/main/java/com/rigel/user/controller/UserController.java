@@ -50,6 +50,7 @@ import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
 import com.rigel.user.model.VerifyKeyRequest;
 import com.rigel.user.model.dto.ResetPasswordRequest;
+import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.model.dto.UserDto;
 import com.rigel.user.security.JwtTokenUtil;
 import com.rigel.user.security.JwtUser;
@@ -188,6 +189,32 @@ public class UserController {
 			}
 		}
 	}
+	
+	@PostMapping(value = "view")
+	public ResponseEntity<Map<String, Object>> view(
+			@RequestBody(required = true) @Valid SearchCriteria searchCriteria, BindingResult result,
+			HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+
+		if (searchCriteria == null) {
+			throw new BadGatewayRequest("Invalid Request");
+		} else if (result.hasFieldErrors()) {
+			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+		} else {
+			User user = userService.findUserById(searchCriteria.getUserId());
+			if (user != null) {
+				data.put("user", user);
+				response.put("data", data);
+				response.put("status", "OK");
+				response.put("code", "200");
+				response.put("message", "Your OTP has been send successfully.");
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else {
+				throw new TaskTitleException("Mobile Number is not registered with us.");
+			}
+		}
+	}
 
 
 	@PostMapping(value = "signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -202,42 +229,40 @@ public class UserController {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
 			System.out.println("userDtoReq.getLogo()" + userDtoReq.getLogo());
-			String fileName = userDtoReq.getLogo() == null ? null
-					: UploadFileUtlity.uploadFiles(userDtoReq.getLogo(), "logo", null);
+//			String fileName = userDtoReq.getLogo() == null ? null
+//					: UploadFileUtlity.uploadFiles(userDtoReq.getLogo(), "logo", null);
 			User user = modelMapper.map(userDtoReq, User.class);
-			user.setLogo(fileName);
-			User user1 = userService.findUserByEmailId(user.getEmail_id(),userDtoReq.getId());
+//			user.setLogo(fileName);
 			User user2 = userService.findUserByEmailId(user.getMobile_no(),userDtoReq.getId());
 			if(user2!=null){
 				throw new TaskTitleException("Mobile Number already registered with us.");
 			}
-			
+			User user1 = userService.findUserByEmailId(user.getEmail_id(),userDtoReq.getId());
 			if (user1 == null) {
-				Set<Roles> rolesSet=new HashSet<>();
-				Roles roles=new Roles();
-				roles.setRole("admin");
-				roles.setRoleName("supper User");
-				rolesSet.add(roles);
-				user.setStatus(1);
-				user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
-				user.setCreated_at(new Timestamp(new Date().getTime()));
-				user.setLogo(fileName);
-				user.setRoles(rolesSet);
-				user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
-				user = userService.saveUser(user);
-				// UserDto userDto = modelMapper.map(user, UserDto.class);
-				final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
-				final String token = jwtTokenUtil.generateToken(userDetails, request);
-				try {
-					emailService.sendHtmlEmail(user.getEmail_id(),user.getSoftwareKey(), user.getEmail_id(),user.getPassword(),user.getSoftwareType());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(user.getId()<1){
+					user.setStatus(1);
+					user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
+					user.setCreated_at(new Timestamp(new Date().getTime()));
+//					user.setLogo(fileName);
+					user.setRole("admin");
+					user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
+					user = userService.saveUser(user);
+					final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
+					final String token = jwtTokenUtil.generateToken(userDetails, request);
+					try {
+						emailService.sendHtmlEmail(user.getEmail_id(),user.getSoftwareKey(), user.getEmail_id(),user.getPassword(),user.getSoftwareType());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					data.put("access_token", token);
+					data.put("user", user);
+					response.put("data", data);
+				}else {
+					user = userService.saveUserDto(userDtoReq);
+					data.put("user", user);
+					response.put("data", data);
 				}
-				
-				data.put("access_token", token);
-				data.put("user", user);
-				response.put("data", data);
 				response.put("status", "OK");
 				response.put("code", "200");
 				response.put("message", "Your account has been created successfully.");

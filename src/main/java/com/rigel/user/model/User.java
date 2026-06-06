@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -67,7 +68,7 @@ public class User implements Serializable{
 	
 	private int status;// 1-active,2-InActive,3-delete
 	private Timestamp created_at;
-//	private List<String> role;// 1- admin,2-user
+	private String role;// 1- admin,2-user
 	
 	private String gender;
 	private Date lastPasswordResetDate;
@@ -97,15 +98,14 @@ public class User implements Serializable{
     // ================= RELATION =================
     
     private String logo;
-    
     private String softwareKey;
     private String macAddress;
     
     private int ownerId;
     
-    @OneToMany(mappedBy = "roles", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JsonManagedReference
-	private Set<Roles> roles = new HashSet<>();
+//    @OneToMany(mappedBy = "user_id", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	@JsonManagedReference
+//	private Set<Roles> roles = new HashSet<>();
     
 	public static PasswordEncoder getPasswordEncoder() {
 		return PASSWORD_ENCODER;

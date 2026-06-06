@@ -19,6 +19,7 @@ import com.rigel.user.dao.IRolesManagementDao;
 import com.rigel.user.dao.ISalesDao;
 import com.rigel.user.model.BuyerInfo;
 import com.rigel.user.model.Inventory;
+import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
 import com.rigel.user.model.SalesInfo;
 import com.rigel.user.model.dto.SalesRequest;
@@ -35,13 +36,25 @@ public class RolesManagementServiceImpl implements IRolesManagementService {
 	private IRolesManagementDao rolesManagementDao;
 
 	@Override
-	public RolesPagePermision saveRolesPagePermission(RolesPagePermision polesPagePermision) {
-		return rolesManagementDao.saveRolesPagePermission(polesPagePermision);
+	public RolesPagePermision saveRolesPagePermission(RolesPagePermision rolesPagePermision) {
+		System.out.println("hhhhhhhhhhhh--------------"+rolesPagePermision);
+//		return null;
+		return rolesManagementDao.saveRolesPagePermission(rolesPagePermision);
 	}
 
 	@Override
 	public List<RolesPagePermision> searchRolesPagePermision(SearchCriteria criteria) {
 		return rolesManagementDao.searchRolesPagePermision(criteria);
+	}
+
+	@Override
+	public List<Pages> fetchPagesList(SearchCriteria criteria) {
+		return rolesManagementDao.fetchPagesList(criteria);
+	}
+
+	@Override
+	public RolesPagePermision findRolesPagePermissionById(Long id) {
+		return rolesManagementDao.findRolesPagePermissionById(id);
 	}
 
 	
