@@ -67,23 +67,20 @@ public class UserAccessController {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
 			if (rolesAccess.getId() != null && rolesAccess.getId() != 0) {
-				RolesPagePermision existingRolesPagePermision = rolesManagementService
-						.findRolesPagePermissionById(rolesAccess.getId());
-				existingRolesPagePermision = rolesManagementService.saveRolesPagePermission(existingRolesPagePermision);
+				RolesPagePermision existingRolesPagePermision = rolesManagementService.findRolesPagePermissionById(rolesAccess.getId());
 				existingRolesPagePermision.setCanAll(rolesAccess.isCanAll());
 				existingRolesPagePermision.setCanView(rolesAccess.isCanView());
 				existingRolesPagePermision.setCanCreate(rolesAccess.isCanCreate());
 				existingRolesPagePermision.setCanEdit(rolesAccess.isCanEdit());
 				existingRolesPagePermision.setCanDelete(rolesAccess.isCanDelete());
+				existingRolesPagePermision = rolesManagementService.saveRolesPagePermission(existingRolesPagePermision);
 				data.put("access", existingRolesPagePermision);
-
 			} else {
 				RolesPagePermision rolesPagePermision = objectMapper.convertValue(rolesAccess, RolesPagePermision.class);
 				rolesPagePermision.setId(null);
 				rolesPagePermision = rolesManagementService.saveRolesPagePermission(rolesPagePermision);
 				data.put("access", rolesPagePermision);
 			}
-//			System.out.println("jjjjjjjjjjjjj=---------" + rolesPagePermision);
 			response.put("data", data);
 			response.put("status", "OK");
 			response.put("code", "200");
@@ -131,6 +128,12 @@ public class UserAccessController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
+			
+			List<User> users = userService.findUsers(SearchCriteria.builder().userId(userDtoReq.getOwnerId()).build());
+			if(users.size()<=2) {
+				throw new TaskTitleException("Max number of user already has been created");
+			}
+			
 			User user = objectMapper.convertValue(userDtoReq, User.class);
 			User user1 = userService.findUserByEmailId(user.getEmail_id(), userDtoReq.getId());
 			User user2 = userService.findUserByEmailId(user.getMobile_no(), userDtoReq.getId());
@@ -142,13 +145,13 @@ public class UserAccessController {
 				user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
 				user.setCreated_at(new Timestamp(new Date().getTime()));
 				user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
-				user = userService.saveUser(user);
+				user = userService.saveSubUser(user);
 
 				data.put("user", user);
 				response.put("data", data);
 				response.put("status", "OK");
 				response.put("code", "200");
-				response.put("message", "Your account has been created successfully.");
+				response.put("message", "Your account has been Updated successfully.");
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
 				throw new TaskTitleException("Email id already registered with us.");

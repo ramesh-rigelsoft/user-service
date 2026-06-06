@@ -10,8 +10,12 @@ import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.model.dto.UserDto;
 
 public interface IUserService {
-	
 	public User saveUser(User user);
+	
+	public User saveSubUser(User user);
+	
+	public User persistUser(User user);
+	
 	public User saveUserDto(UserDto userDto);
 	
 	public User findUserById(int id);

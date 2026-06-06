@@ -26,7 +26,6 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 
 	@Override
 	public RolesPagePermision saveRolesPagePermission(RolesPagePermision rolesPagePermision) {
-
 		return entityManager.merge(rolesPagePermision);
 	}
 

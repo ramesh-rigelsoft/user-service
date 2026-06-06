@@ -23,9 +23,19 @@ public class UserDaoimpl implements IUserDao {
 
 	@Autowired
 	EntityManager entityManager;
-
+	
 	@Override
 	public User saveUser(User user) {
+		return entityManager.merge(user);
+	}
+	
+	@Override
+	public User saveSubUser(User user) {
+		return entityManager.merge(user);
+	}
+	
+	@Override
+	public User persistUser(User user) {
 		User user1=entityManager.merge(user);
 		user1.setOwnerId(user1.getId());
 		return entityManager.merge(user1);

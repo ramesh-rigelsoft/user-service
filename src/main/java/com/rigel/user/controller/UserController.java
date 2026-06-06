@@ -246,7 +246,7 @@ public class UserController {
 //					user.setLogo(fileName);
 					user.setRole("admin");
 					user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
-					user = userService.saveUser(user);
+					user = userService.persistUser(user);
 					final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 					final String token = jwtTokenUtil.generateToken(userDetails, request);
 					try {

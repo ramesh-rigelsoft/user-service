@@ -28,6 +28,8 @@ import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.service.IBuyerInfoService;
 import com.rigel.user.service.IRolesManagementService;
 
+import jakarta.validation.ValidationException;
+
 @Service
 //@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
 public class RolesManagementServiceImpl implements IRolesManagementService {
@@ -37,8 +39,9 @@ public class RolesManagementServiceImpl implements IRolesManagementService {
 
 	@Override
 	public RolesPagePermision saveRolesPagePermission(RolesPagePermision rolesPagePermision) {
-		System.out.println("hhhhhhhhhhhh--------------"+rolesPagePermision);
-//		return null;
+		if(rolesPagePermision.getOwnerId()<1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");			
+		}
 		return rolesManagementDao.saveRolesPagePermission(rolesPagePermision);
 	}
 

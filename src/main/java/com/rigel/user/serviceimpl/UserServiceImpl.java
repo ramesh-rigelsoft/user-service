@@ -64,6 +64,14 @@ public class UserServiceImpl implements IUserService {
 	}
 	
 	@Override
+	public User saveSubUser(User user) {
+		if(user.getOwnerId()<1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");			
+		}
+		return userDao.saveSubUser(user);
+	}
+	
+	@Override
 	public User saveUserDto(UserDto userDto) {
 		int userId = userDto.getId();
 		if (userId > 0) {
@@ -234,6 +242,11 @@ public class UserServiceImpl implements IUserService {
 //		target.setMacAddress(source.getMacAddress());
 //
 //		target.setOwnerId(source.getOwnerId());
+	}
+
+	@Override
+	public User persistUser(User user) {
+		return userDao.persistUser(user);
 	}
 
 }
