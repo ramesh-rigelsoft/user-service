@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,6 +48,9 @@ public class User implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+	
+	@Transient
+	private Object rolesPermision;
 	
 //	@Pattern(
 //		    regexp = "^[A-Za-z]+(\\s[A-Za-z]+){0,3}$",
@@ -101,6 +105,9 @@ public class User implements Serializable{
     private String softwareKey;
     private String macAddress;
     
+//    private boolean isMultipleBranch;
+//    private String branchCode;
+//    private String branchName;    
     private int ownerId;
     
 //    @OneToMany(mappedBy = "user_id", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -54,7 +54,7 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 				SELECT p
 				FROM Pages p
 				WHERE p.status = true
-				ORDER BY p.pageName
+				ORDER BY p.tab DESC 
 				""";
 
 		return entityManager.createQuery(jpql, Pages.class).getResultList();

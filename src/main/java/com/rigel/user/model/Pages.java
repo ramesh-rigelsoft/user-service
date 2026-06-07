@@ -23,13 +23,13 @@ public class Pages implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "page_url", nullable = false)
-    private String roleUrl;
-    
-    @Column(name = "page_name", nullable = false)
-    private String pageName;
-    
-    private String description;
+    @Column(name = "tab", nullable = false)
+    private String tab;
+    @Column(name = "label", nullable = false)
+    private String label;
+    @Column(name = "path", nullable = false)
+    private String path;
+    private String icon;
     
     private boolean status;
     
