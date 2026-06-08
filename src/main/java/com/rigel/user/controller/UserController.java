@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rigel.user.util.*;
 import com.rigel.user.util.Constaints;
 import com.rigel.user.annotation.ApiSecured;
+import com.rigel.user.dao.IRolesManagementDao;
 import com.rigel.user.exception.BadGatewayRequest;
 import com.rigel.user.exception.TaskTitleException;
 import com.rigel.user.exception.TaskTitleNotFound;
@@ -49,12 +50,14 @@ import com.rigel.user.model.Roles;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
 import com.rigel.user.model.VerifyKeyRequest;
+import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.ResetPasswordRequest;
 import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.model.dto.UserDto;
 import com.rigel.user.security.JwtTokenUtil;
 import com.rigel.user.security.JwtUser;
 import com.rigel.user.service.ILoginInfoService;
+import com.rigel.user.service.IRolesManagementService;
 import com.rigel.user.service.IUserLogOutIn;
 import com.rigel.user.service.IUserService;
 import com.rigel.user.serviceimpl.EmailService;
@@ -87,6 +90,9 @@ public class UserController {
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
+	
+	@Autowired
+	private IRolesManagementService rolesManagementService;
 	
 
 //	@Autowired
@@ -285,14 +291,13 @@ public class UserController {
 			throw new TaskTitleException("Wrong password");
 		} else {
 
-			
-			// if(user.getMacAddress().split("\\|")[0].equalsIgnoreCase(login.getMacAddress()))
-			// {
-//			UserDto userDto = modelMapper.map(user, UserDto.class);
 			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 			final String token = jwtTokenUtil.generateToken(userDetails, request);
+			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
+			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
 			data.put("access_token", token);
 			data.put("user", user);
+			data.put("page_access", menuDto);
 			response.put("data", data);
 			response.put("status", "OK");
 			response.put("code", "200");

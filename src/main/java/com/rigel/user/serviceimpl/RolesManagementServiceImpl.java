@@ -22,6 +22,7 @@ import com.rigel.user.model.Inventory;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
 import com.rigel.user.model.SalesInfo;
+import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.SalesRequest;
 import com.rigel.user.model.dto.SalesResponse;
 import com.rigel.user.model.dto.SearchCriteria;
@@ -58,6 +59,16 @@ public class RolesManagementServiceImpl implements IRolesManagementService {
 	@Override
 	public RolesPagePermision findRolesPagePermissionById(Long id) {
 		return rolesManagementDao.findRolesPagePermissionById(id);
+	}
+
+	@Override
+	public List<MenuDto> getMenus(Long roleId, Integer ownerId) {
+		return rolesManagementDao.getMenus(roleId, ownerId);
+	}
+
+	@Override
+	public Long getRoleIdByRole(String role) {
+		return rolesManagementDao.getRoleIdByRole(role);
 	}
 
 	

@@ -49,9 +49,6 @@ public class User implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Transient
-	private Object rolesPermision;
-	
 //	@Pattern(
 //		    regexp = "^[A-Za-z]+(\\s[A-Za-z]+){0,3}$",
 //		    message = "Name must contain maximum 4 words (letters only)"
