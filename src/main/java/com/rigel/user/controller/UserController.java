@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rigel.user.util.*;
 import com.rigel.user.util.Constaints;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.user.annotation.ApiSecured;
 import com.rigel.user.dao.IRolesManagementDao;
 import com.rigel.user.exception.BadGatewayRequest;
@@ -47,12 +48,14 @@ import com.rigel.user.model.LoginDetails;
 import com.rigel.user.model.LoginRequest;
 import com.rigel.user.model.Mail;
 import com.rigel.user.model.Roles;
+import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
 import com.rigel.user.model.VerifyKeyRequest;
 import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.ResetPasswordRequest;
 import com.rigel.user.model.dto.SearchCriteria;
+import com.rigel.user.model.dto.SubscriptionPlanDto;
 import com.rigel.user.model.dto.UserDto;
 import com.rigel.user.security.JwtTokenUtil;
 import com.rigel.user.security.JwtUser;
@@ -81,6 +84,9 @@ public class UserController {
 
 	@Autowired
 	ModelMapper modelMapper;
+	
+	@Autowired
+	ObjectMapper objectMapper;
 
 //	@Autowired
 //	CryptoAES128 cryptoAES128;
@@ -295,9 +301,13 @@ public class UserController {
 			final String token = jwtTokenUtil.generateToken(userDetails, request);
 			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
 			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
+			SubscriptionPlan subscriptionPlan=rolesManagementService.findBySubscriptionCode(user.getSubscriptionCode());
+			SubscriptionPlanDto subscriptionPlanDto=objectMapper.convertValue(subscriptionPlan, SubscriptionPlanDto.class);
+			System.out.println(subscriptionPlanDto.toString());
 			data.put("access_token", token);
 			data.put("user", user);
 			data.put("page_access", menuDto);
+			data.put("subscription_plan", subscriptionPlanDto);
 			response.put("data", data);
 			response.put("status", "OK");
 			response.put("code", "200");

@@ -1,5 +1,6 @@
 package com.rigel.user.daoimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +11,20 @@ import com.rigel.user.dao.IItemsDao;
 import com.rigel.user.dao.IRolesManagementDao;
 import com.rigel.user.model.BuyerInfo;
 import com.rigel.user.model.Items;
+import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
+import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.SearchCriteria;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 
 @Repository
@@ -114,6 +123,81 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+// office section
+	@Override
+	public OfficeBranch saveOfficeBranch(OfficeBranch officeBranch) {
+		return entityManager.merge(officeBranch);
+	}
+
+	@Override
+	public List<OfficeBranch> searchOfficeBranch(SearchCriteria search) {
+
+	    StringBuilder jpql = new StringBuilder(
+	            "SELECT o FROM OfficeBranch o WHERE o.ownerId = :ownerId"
+	    );
+
+	    if (search.getSearchKeyword() != null &&
+	        !search.getSearchKeyword().trim().isEmpty()) {
+
+	        jpql.append(
+	            " AND (" +
+	            "LOWER(o.branchCode) LIKE :keyword OR " +
+	            "LOWER(o.branchName) LIKE :keyword OR " +
+	            "LOWER(o.address) LIKE :keyword OR " +
+	            "LOWER(o.additionalDetails) LIKE :keyword" +
+	            ")"
+	        );
+	    }
+	    if (search.getItemId() != null&&!search.getItemId().isBlank()) {
+	    	 jpql.append(" AND o.id =: id ");
+	    }
+
+	    TypedQuery<OfficeBranch> query =
+	            entityManager.createQuery(jpql.toString(), OfficeBranch.class);
+
+	    query.setParameter("ownerId", search.getUserId());
+
+	    if (search.getSearchKeyword() != null &&
+	        !search.getSearchKeyword().trim().isEmpty()) {
+
+	        query.setParameter(
+	                "keyword",
+	                "%" + search.getSearchKeyword().toLowerCase() + "%"
+	        );
+	    }
+	    if (search.getItemId() != null&&!search.getItemId().isBlank()) {
+	    	query.setParameter("id", search.getItemId());
+
+	    }
+
+	    return query
+	            .setFirstResult(0)
+	            .setMaxResults(11)
+	            .getResultList();
+	}
+
+	@Override
+	public OfficeBranch updateOfficeBranch(OfficeBranch officeBranch) {
+		return entityManager.merge(officeBranch);
+	}
+
+	@Override
+	public SubscriptionPlan saveSubscriptionPlan(SubscriptionPlan subscription) {
+		return entityManager.merge(subscription);
+	}
+
+	@Override
+	public SubscriptionPlan findBySubscriptionCode(String code) {
+	    try {
+	        return entityManager.createQuery(
+	                "SELECT sp FROM SubscriptionPlan sp WHERE sp.status=true AND sp.subscriptionCode = :code",
+	                SubscriptionPlan.class)
+	                .setParameter("code", code)
+	                .getSingleResult();
+	    } catch (Exception e) {
+	        return null;
+	    }
 	}
 
 }

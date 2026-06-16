@@ -76,6 +76,8 @@ public class UserDto {
     // ================= RELATION =================
     
     private int ownerId;
+    
+    private String subscriptionCode;
 
     private MultipartFile logo;
 }

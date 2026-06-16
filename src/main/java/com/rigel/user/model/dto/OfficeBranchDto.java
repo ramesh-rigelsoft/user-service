@@ -1,4 +1,4 @@
-package com.rigel.user.model;
+package com.rigel.user.model.dto;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -14,33 +14,27 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.rigel.user.model.User;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Entity
-@Table(name = "OFFICE_BRANCH")
-public class OfficeBranch implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(length = 36, updatable = false, nullable = false)
+@ToString
+public class OfficeBranchDto  {
+	
     private String id;
 
-    @NotBlank(message = "Type is required")
     private String branchCode;   // Travel, Food, Salary etc.
 
-    @NotBlank(message = "Scope is required")
+    @NotBlank(message = "Branch Name is required")
     private String branchName;  // Personal / Business
 
-    @Column(length = 500)
+    @Column(length = 300)
     private String address;
+
    
-    @Column( name = "ownerId",insertable = true,updatable = false)
     private int ownerId; // reference to the user/owner
     
     private LocalDateTime createdAt;
@@ -49,9 +43,6 @@ public class OfficeBranch implements Serializable {
     private boolean status;
     private String additionalDetails;
     
-// 	@ManyToOne(fetch = FetchType.LAZY)
-// 	@JoinColumn(name="user")
-// 	@JsonBackReference(value = "userOfc")
-// 	private User user;
+ 	private User user;
  
 }

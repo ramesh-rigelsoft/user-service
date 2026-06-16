@@ -19,9 +19,11 @@ import com.rigel.user.dao.IRolesManagementDao;
 import com.rigel.user.dao.ISalesDao;
 import com.rigel.user.model.BuyerInfo;
 import com.rigel.user.model.Inventory;
+import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
 import com.rigel.user.model.SalesInfo;
+import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.SalesRequest;
 import com.rigel.user.model.dto.SalesResponse;
@@ -69,6 +71,28 @@ public class RolesManagementServiceImpl implements IRolesManagementService {
 	@Override
 	public Long getRoleIdByRole(String role) {
 		return rolesManagementDao.getRoleIdByRole(role);
+	}
+
+	@Override
+	public OfficeBranch saveOfficeBranch(OfficeBranch officeBranch) {
+		officeBranch.setStatus(true);
+		officeBranch.setCreatedAt(LocalDateTime.now());
+		return rolesManagementDao.saveOfficeBranch(officeBranch);
+	}
+
+	@Override
+	public List<OfficeBranch> searchOfficeBranch(SearchCriteria search) {
+		return rolesManagementDao.searchOfficeBranch(search);
+	}
+
+	@Override
+	public OfficeBranch updateOfficeBranch(OfficeBranch officeBranch) {
+		return rolesManagementDao.updateOfficeBranch(officeBranch);
+	}
+
+	@Override
+	public SubscriptionPlan findBySubscriptionCode(String code) {
+		return rolesManagementDao.findBySubscriptionCode(code);
 	}
 
 	

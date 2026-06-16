@@ -13,6 +13,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -25,6 +27,7 @@ import lombok.Setter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
@@ -101,16 +104,19 @@ public class User implements Serializable{
     private String logo;
     private String softwareKey;
     private String macAddress;
+    private String subscriptionCode;
     
 //    private boolean isMultipleBranch;
 //    private String branchCode;
 //    private String branchName;    
     private int ownerId;
     
-//    @OneToMany(mappedBy = "user_id", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//	@JsonManagedReference
-//	private Set<Roles> roles = new HashSet<>();
-    
+//    private String branchId;
+       
+// 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	@JsonManagedReference(value = "userOfc")
+//	private Set<OfficeBranch> OfficeBranch = new HashSet<>();
+ 	
 	public static PasswordEncoder getPasswordEncoder() {
 		return PASSWORD_ENCODER;
 	}
