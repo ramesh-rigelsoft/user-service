@@ -262,7 +262,9 @@ public class UserController {
 					final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 					final String token = jwtTokenUtil.generateToken(userDetails, request);
 					try {
-						emailService.sendHtmlEmail(user.getEmail_id(),user.getSoftwareKey(), user.getEmail_id(),user.getPassword(),user.getSoftwareType());
+						if(user.getRole().equalsIgnoreCase("admin")) {
+						    emailService.sendHtmlEmail(user.getEmail_id(),user.getSoftwareKey(), user.getEmail_id(),userDtoReq.getPassword(),user.getSoftwareType());
+						}
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -303,7 +305,7 @@ public class UserController {
 			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
 			SubscriptionPlan subscriptionPlan=rolesManagementService.findBySubscriptionCode(user.getSubscriptionCode());
 			SubscriptionPlanDto subscriptionPlanDto=objectMapper.convertValue(subscriptionPlan, SubscriptionPlanDto.class);
-			System.out.println(subscriptionPlanDto.toString());
+			System.out.println(user.getBranchCode());
 			data.put("access_token", token);
 			data.put("user", user);
 			data.put("page_access", menuDto);

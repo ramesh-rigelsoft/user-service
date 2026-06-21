@@ -53,6 +53,10 @@ public class UserDto {
 	private String gender;
 	private Date lastPasswordResetDate;
 	
+    private boolean multipleBranch;
+    private String branchCode;
+    private String branchName;
+	
     // ================= COMPANY INFO =================
 	private String shopType;
 	private String softwareType;

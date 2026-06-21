@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -106,9 +107,11 @@ public class User implements Serializable{
     private String macAddress;
     private String subscriptionCode;
     
-//    private boolean isMultipleBranch;
-//    private String branchCode;
-//    private String branchName;    
+//    @Column(columnDefinition = "boolean default false")
+    private boolean multipleBranch;
+    private String branchCode;
+    private String branchName;
+    
     private int ownerId;
     
 //    private String branchId;
