@@ -8,11 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.rigel.user.dao.IBuyerDao;
-import com.rigel.user.dao.IItemsDao;
 import com.rigel.user.dao.IRolesManagementDao;
-import com.rigel.user.model.BuyerInfo;
-import com.rigel.user.model.Items;
 import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;

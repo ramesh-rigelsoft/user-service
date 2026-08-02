@@ -2,14 +2,11 @@ package com.rigel.user.service;
 
 import java.util.List;
 
-import com.rigel.user.model.BuyerInfo;
 import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
 import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.dto.MenuDto;
-import com.rigel.user.model.dto.SalesRequest;
-import com.rigel.user.model.dto.SalesResponse;
 import com.rigel.user.model.dto.SearchCriteria;
 
 public interface IRolesManagementService {

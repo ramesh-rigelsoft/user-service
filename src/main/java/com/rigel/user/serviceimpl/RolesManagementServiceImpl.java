@@ -13,22 +13,13 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rigel.user.dao.IBuyerDao;
-import com.rigel.user.dao.IInventoryDao;
 import com.rigel.user.dao.IRolesManagementDao;
-import com.rigel.user.dao.ISalesDao;
-import com.rigel.user.model.BuyerInfo;
-import com.rigel.user.model.Inventory;
 import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
-import com.rigel.user.model.SalesInfo;
 import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.dto.MenuDto;
-import com.rigel.user.model.dto.SalesRequest;
-import com.rigel.user.model.dto.SalesResponse;
 import com.rigel.user.model.dto.SearchCriteria;
-import com.rigel.user.service.IBuyerInfoService;
 import com.rigel.user.service.IRolesManagementService;
 
 import jakarta.validation.ValidationException;

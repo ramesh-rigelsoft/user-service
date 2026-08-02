@@ -2,7 +2,6 @@ package com.rigel.user.dao;
 
 import java.util.List;
 
-import com.rigel.user.model.BuyerInfo;
 import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
