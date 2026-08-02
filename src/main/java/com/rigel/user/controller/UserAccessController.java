@@ -130,9 +130,9 @@ public class UserAccessController {
 		} else {
 			
 			List<User> users = userService.findUsers(SearchCriteria.builder().userId(userDtoReq.getOwnerId()).build());
-			if(users.size()<=2) {
-				throw new TaskTitleException("Max number of user already has been created");
-			}
+//			if(users.size()<=2) {
+//				throw new TaskTitleException("Max number of user already has been created");
+//			}
 			
 			User user = objectMapper.convertValue(userDtoReq, User.class);
 			User user1 = userService.findUserByEmailId(user.getEmail_id(), userDtoReq.getId());
@@ -145,6 +145,7 @@ public class UserAccessController {
 				user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
 				user.setCreated_at(new Timestamp(new Date().getTime()));
 				user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
+				System.out.println("userId------------"+user.getOwnerId());
 				user = userService.saveSubUser(user);
 
 				data.put("user", user);

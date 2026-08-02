@@ -80,10 +80,10 @@ public class OfficeBranchController {
 				data.put("branch", officeBranchDto);
 			} else {
 				List<OfficeBranch> existingBranchList = rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(officeBranchDto.getOwnerId()).build());
-				int maxNo = existingBranchList == null ? 1 : existingBranchList.stream().mapToInt(b -> Integer.parseInt(b.getBranchCode().substring(3))).max().orElse(1);
+				int maxNo = existingBranchList == null ? 0 : existingBranchList.stream().mapToInt(b -> Integer.parseInt(b.getBranchCode().substring(6))).max().orElse(0);
 				OfficeBranch officeBranch = objectMapper.convertValue(officeBranchDto,OfficeBranch.class);
 				officeBranch.setId(null);
-				officeBranch.setBranchCode("OFC"+String.format("%02d", maxNo+1));
+				officeBranch.setBranchCode("BRT"+String.format("%03d",officeBranch.getOwnerId())+String.format("%02d", maxNo+1));
 				officeBranch = rolesManagementService.saveOfficeBranch(officeBranch);
 				data.put("branch", officeBranch);
 			}

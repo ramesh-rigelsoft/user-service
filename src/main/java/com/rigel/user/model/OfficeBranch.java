@@ -49,6 +49,8 @@ public class OfficeBranch implements Serializable {
     private boolean status;
     private String additionalDetails;
     
+    private String branchLogo;
+    
 // 	@ManyToOne(fetch = FetchType.LAZY)
 // 	@JoinColumn(name="user")
 // 	@JsonBackReference(value = "userOfc")
