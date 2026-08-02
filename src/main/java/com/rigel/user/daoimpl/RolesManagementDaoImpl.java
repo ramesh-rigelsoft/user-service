@@ -1,7 +1,9 @@
 package com.rigel.user.daoimpl;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -77,38 +79,38 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 				.getSingleResult();
 	}
 
-	@Override
-	public List<MenuDto> getMenus(Long roleId, Integer ownerId) {
-
-		if (roleId == 1) {
-			return entityManager.createQuery("""
-					    SELECT new com.rigel.user.model.dto.MenuDto(
-					        p.tab,
-					        p.label,
-					        p.path,
-					        p.icon
-					    )
-					    FROM Pages p
-					    WHERE p.status = true
-					    ORDER BY p.id
-					""", MenuDto.class).getResultList();
-		}
-
-		return entityManager.createQuery("""
-				SELECT new com.rigel.user.model.dto.MenuDto(
-				    p.tab,
-				    p.label,
-				    p.path,
-				    p.icon
-				)
-				FROM RolesPagePermision rpp
-				JOIN rpp.pageId p
-				WHERE rpp.roleId.id = :roleId
-				  AND rpp.ownerId = :ownerId
-				  AND rpp.canView = true
-				ORDER BY p.id
-				""", MenuDto.class).setParameter("roleId", roleId).setParameter("ownerId", ownerId).getResultList();
-	}
+//	@Override
+//	public List<MenuDto> getMenus(Long roleId, Integer ownerId) {
+//
+//		if (roleId == 1) {
+//			return entityManager.createQuery("""
+//					    SELECT new com.rigel.user.model.dto.MenuDto(
+//					        p.tab,
+//					        p.label,
+//					        p.path,
+//					        p.icon
+//					    )
+//					    FROM Pages p
+//					    WHERE p.status = true
+//					    ORDER BY p.id
+//					""", MenuDto.class).getResultList();
+//		}
+//
+//		return entityManager.createQuery("""
+//				SELECT new com.rigel.user.model.dto.MenuDto(
+//				    p.tab,
+//				    p.label,
+//				    p.path,
+//				    p.icon
+//				)
+//				FROM RolesPagePermision rpp
+//				JOIN rpp.pageId p
+//				WHERE rpp.roleId.id = :roleId
+//				  AND rpp.ownerId = :ownerId
+//				  AND rpp.canView = true
+//				ORDER BY p.id
+//				""", MenuDto.class).setParameter("roleId", roleId).setParameter("ownerId", ownerId).getResultList();
+//	}
 
 	@Override
 	public Long getRoleIdByRole(String role) {
@@ -198,6 +200,115 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 	    } catch (Exception e) {
 	        return null;
 	    }
+	}
+	
+	@Override
+	public List<MenuDto> getMenus(Long roleId, Integer ownerId) {
+
+	    List<Object[]> rows;
+
+	    if (roleId == 1) {
+
+	        rows = entityManager.createQuery("""
+	                SELECT p.tab,
+	                       p.label,
+	                       p.path,
+	                       p.icon,
+	                       p.parent
+	                FROM Pages p
+	                WHERE p.status = true
+	                ORDER BY p.id
+	                """, Object[].class)
+	                .getResultList();
+
+	    } else {
+
+	        rows = entityManager.createQuery("""
+	                SELECT p.tab,
+	                       p.label,
+	                       p.path,
+	                       p.icon,
+	                       p.parent
+	                FROM RolesPagePermision rpp
+	                JOIN rpp.pageId p
+	                WHERE rpp.roleId.id = :roleId
+	                  AND rpp.ownerId = :ownerId
+	                  AND rpp.canView = true
+	                  AND p.status = true
+	                ORDER BY p.id
+	                """, Object[].class)
+	                .setParameter("roleId", roleId)
+	                .setParameter("ownerId", ownerId)
+	                .getResultList();
+	    }
+
+
+	    Map<String, MenuDto> menuMap = new LinkedHashMap<>();
+	    List<MenuDto> result = new ArrayList<>();
+
+
+	    // Create all menus first
+	    for (Object[] row : rows) {
+
+	        String tab = (String) row[0];
+
+	        MenuDto dto = MenuDto.builder()
+	                .tab(tab)
+	                .label((String) row[1])
+	                .path((String) row[2])
+	                .icon((String) row[3])
+	                .children(new ArrayList<>())
+	                .build();
+
+	        menuMap.put(tab.toLowerCase(), dto);
+	    }
+
+
+	    // Create hierarchy
+	    for (Object[] row : rows) {
+
+	        String tab = (String) row[0];
+	        String parent = (String) row[4];
+
+	        MenuDto currentMenu = menuMap.get(tab.toLowerCase());
+
+
+	        // Child menu
+	        if (parent != null && !parent.trim().isEmpty()) {
+
+	            String parentKey = parent.toLowerCase();
+
+	            MenuDto parentMenu = menuMap.get(parentKey);
+
+
+	            // Parent not available, create dynamically
+	            if (parentMenu == null) {
+
+	                parentMenu = MenuDto.builder()
+	                        .tab(parentKey)
+	                        .label(parent.toLowerCase())
+	                        .path(null)
+	                        .icon(null)
+	                        .children(new ArrayList<>())
+	                        .build();
+
+	                menuMap.put(parentKey, parentMenu);
+	                result.add(parentMenu);
+	            }
+
+
+	            parentMenu.getChildren().add(currentMenu);
+
+
+	        } else {
+
+	            // Root menu
+	            result.add(currentMenu);
+	        }
+	    }
+
+
+	    return result;
 	}
 
 }

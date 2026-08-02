@@ -105,6 +105,7 @@ public class User implements Serializable{
     private String logo;
     private String softwareKey;
     private String macAddress;
+//    @Column(columnDefinition = "String default null")
     private String subscriptionCode;
     
 //    @Column(columnDefinition = "boolean default false")
@@ -114,7 +115,7 @@ public class User implements Serializable{
     
     private int ownerId;
     
-//    private String branchId;
+//    private int subscriptionId;
        
 // 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //	@JsonManagedReference(value = "userOfc")

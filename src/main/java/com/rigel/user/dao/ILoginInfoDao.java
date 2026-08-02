@@ -5,7 +5,6 @@ import java.util.List;
 import com.rigel.user.model.Items;
 import com.rigel.user.model.LoginActivity;
 import com.rigel.user.model.SalesInfo;
-import com.rigel.user.model.TodoTask;
 import com.rigel.user.model.dto.SearchCriteria;
 
 public interface ILoginInfoDao {

@@ -31,7 +31,7 @@ public class SubscriptionPlan implements Serializable {
     private String subscriptionName;
     
     @Column(unique = true)
-    private String subscriptionCode;   // Travel, Food, Salary etc.
+    private String subscriptionCode;   // SUB01
 
     private String subscriptionType;   // Monthaly,Qutarily,HelfYerily,Yerily
 

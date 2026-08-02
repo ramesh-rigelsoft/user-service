@@ -1,5 +1,7 @@
 package com.rigel.user.model.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,5 +21,6 @@ public class MenuDto {
 	private String label;
 	private String path;
 	private String icon;
+	private List<MenuDto> children;
 
 }
