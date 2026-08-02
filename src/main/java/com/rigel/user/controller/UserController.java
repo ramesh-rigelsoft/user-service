@@ -43,7 +43,6 @@ import com.rigel.user.dao.IRolesManagementDao;
 import com.rigel.user.exception.BadGatewayRequest;
 import com.rigel.user.exception.TaskTitleException;
 import com.rigel.user.exception.TaskTitleNotFound;
-import com.rigel.user.model.LoginActivity;
 import com.rigel.user.model.LoginDetails;
 import com.rigel.user.model.LoginRequest;
 import com.rigel.user.model.Mail;
@@ -59,12 +58,10 @@ import com.rigel.user.model.dto.SubscriptionPlanDto;
 import com.rigel.user.model.dto.UserDto;
 import com.rigel.user.security.JwtTokenUtil;
 import com.rigel.user.security.JwtUser;
-import com.rigel.user.service.ILoginInfoService;
 import com.rigel.user.service.IRolesManagementService;
 import com.rigel.user.service.IUserLogOutIn;
 import com.rigel.user.service.IUserService;
 import com.rigel.user.serviceimpl.EmailService;
-import com.rigel.user.serviceimpl.LoginInfoService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
