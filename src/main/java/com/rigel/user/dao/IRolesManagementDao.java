@@ -32,7 +32,7 @@ public interface IRolesManagementDao {
 	public SubscriptionPlan saveSubscriptionPlan(SubscriptionPlan subscription);
 	public SubscriptionPlan findBySubscriptionCode(String code);
 	
-	public UserSubscription getSubscriptionPlanByOwnerId(Integer ownerId);
+	public UserSubscription getSubscriptionPlanByOwnerId(Integer ownerId,String branchCode);
 
 
 }

@@ -249,4 +249,9 @@ public class UserServiceImpl implements IUserService {
 		return userDao.persistUser(user);
 	}
 
+	@Override
+	public List<User> findUsersByOwnerIdAndBranch(SearchCriteria searchCriteria) {
+		return userDao.findUsersByOwnerIdAndBranch(searchCriteria);
+	}
+
 }

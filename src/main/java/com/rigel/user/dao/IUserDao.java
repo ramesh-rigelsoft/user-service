@@ -26,5 +26,6 @@ public interface IUserDao {
 	public UserOtp findUserOtpByMobileNo(String mobileNo);
 	
 	public List<User> findUsers(SearchCriteria searcCriteria);
+	public List<User> findUsersByOwnerIdAndBranch(SearchCriteria searchCriteria);
 	
 }

@@ -1,4 +1,4 @@
-package com.rigel.user.model.dto;
+package com.rigel.user.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -11,23 +11,34 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+import com.rigel.user.util.PagePermission;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
-public class SubscriptionPlanDto{
+@Entity
+@Table(name = "user_subscription_log")
+public class UserSubscriptionLog implements Serializable {
 
-    private String subscriptionName;
+    private static final long serialVersionUID = 1L;
+
+    @Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
     
     private int ownerId;
     private String branchCode;
     
-    private String subscriptionCode;   // Travel, Food, Salary etc.
+    private boolean status;
+    
+    private boolean active;
+
+    private String subscriptionName;
+    
+ 
+    private String subscriptionCode;   // SUB01
 
     private String subscriptionType;   // Monthaly,Qutarily,HelfYerily,Yerily
 
@@ -42,12 +53,18 @@ public class SubscriptionPlanDto{
 
     private int perBranchUser;
     
+    private int branchCount;
+    
     private boolean isMultipleUser;
     
     private int userCount; 
-       
+    
+    private LocalDateTime createdAt;
+    
+    private LocalDateTime subscriptionStartAt;
+    private int subscriptionDuration;
+   
     private String permissions;
-    private boolean status;
     
     private boolean isReplaceItem;
     private boolean isReturnItem;
@@ -57,6 +74,6 @@ public class SubscriptionPlanDto{
     private boolean isDownloadExcelSales;
     private boolean isDownloadExcelEntryItem;
     private int SUKCount;
+
       
 }
-

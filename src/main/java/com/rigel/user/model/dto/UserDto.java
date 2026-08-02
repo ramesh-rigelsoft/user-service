@@ -52,10 +52,7 @@ public class UserDto {
 	
 	private String gender;
 	private Date lastPasswordResetDate;
-	
-    private boolean multipleBranch;
-    private String branchCode;
-    private String branchName;
+	private int branchCount;
 	
     // ================= COMPANY INFO =================
 	private String shopType;
@@ -80,6 +77,8 @@ public class UserDto {
     // ================= RELATION =================
     
     private int ownerId;
+    private String branchCode;
+    private String branchName;
     
     private String subscriptionCode;
 

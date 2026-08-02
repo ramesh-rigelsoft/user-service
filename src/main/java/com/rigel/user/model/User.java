@@ -78,6 +78,8 @@ public class User implements Serializable{
 	private String gender;
 	private Date lastPasswordResetDate;
 	
+	private int branchCount;
+	
     // ================= COMPANY INFO =================
 	// ================= COMPANY INFO =================
 
@@ -107,13 +109,10 @@ public class User implements Serializable{
     private String macAddress;
 //    @Column(columnDefinition = "String default null")
     private String subscriptionCode;
-    
-//    @Column(columnDefinition = "boolean default false")
-    private boolean multipleBranch;
+        
+    private int ownerId;
     private String branchCode;
     private String branchName;
-    
-    private int ownerId;
     
 //    private int subscriptionId;
        

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -35,7 +36,9 @@ import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.dto.RolesPagePermisionDto;
 import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.model.dto.UserDto;
+import com.rigel.user.model.dto.UserSubscriptionDto;
 import com.rigel.user.service.IRolesManagementService;
+import com.rigel.user.service.ISubscriptionPlanService;
 import com.rigel.user.service.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -55,6 +58,9 @@ public class UserAccessController {
 
 	@Autowired
 	IUserService userService;
+	
+	@Autowired
+	ISubscriptionPlanService subscriptionPlanService;
 
 	@PostMapping(value = "saveRolePermission")
 	public ResponseEntity<Map<String, Object>> rolePermission(
@@ -130,11 +136,12 @@ public class UserAccessController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
+			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(userDtoReq.getOwnerId(), userDtoReq.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
 			
-			List<User> users = userService.findUsers(SearchCriteria.builder().userId(userDtoReq.getOwnerId()).build());
-//			if(users.size()<=2) {
-//				throw new TaskTitleException("Max number of user already has been created");
-//			}
+			List<User> users = userService.findUsersByOwnerIdAndBranch(SearchCriteria.builder().branchCode(userDtoReq.getBranchCode()).userId(userDtoReq.getOwnerId()).build());
+			if((users.size()+1) > userSubscriptionDto.getPerBranchUser()) {
+				throw new TaskTitleException("Max number of user already has been created in this Office");
+			}
 			
 			User user = objectMapper.convertValue(userDtoReq, User.class);
 			User user1 = userService.findUserByEmailId(user.getEmail_id(), userDtoReq.getId());

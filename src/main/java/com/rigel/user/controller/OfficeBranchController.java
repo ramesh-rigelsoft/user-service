@@ -21,6 +21,7 @@ import com.rigel.user.annotation.ApiSecured;
 import com.rigel.user.exception.BadGatewayRequest;
 import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.SubscriptionPlan;
+import com.rigel.user.model.User;
 import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.dto.OfficeBranchDto;
 import com.rigel.user.model.dto.SearchCriteria;
@@ -64,7 +65,7 @@ public class OfficeBranchController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			UserSubscription subscriptionPlan=subscriptionPlanService.getSubscriptionPlanByOwnerId(officeBranchDto.getOwnerId());
+//			UserSubscription subscriptionPlan=subscriptionPlanService.getSubscriptionPlanByOwnerId(officeBranchDto.getOwnerId());
 			if (officeBranchDto.getId() != null&&!officeBranchDto.getId().isBlank()&&officeBranchDto.getId().length()>10) {
 				OfficeBranch existingBranch = rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(officeBranchDto.getOwnerId()).itemId(officeBranchDto.getId()).build()).stream().findFirst().orElse(null);
 				existingBranch.setBranchName(officeBranchDto.getBranchName());
@@ -75,8 +76,9 @@ public class OfficeBranchController {
 				rolesManagementService.updateOfficeBranch(existingBranch);
 				data.put("branch", officeBranchDto);
 			} else {
+				User user=userService.findUserById(officeBranchDto.getOwnerId());
 				List<OfficeBranch> existingBranchList = rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(officeBranchDto.getOwnerId()).build());
-				if(existingBranchList.size() > subscriptionPlan.getBranchCount()-1) {
+				if((existingBranchList.size()+1) > user.getBranchCount()) {
 					throw new BadGatewayRequest("You have reached the maximum number of branches allowed by your subscription plan.");
 				}
 				int maxNo = existingBranchList == null ? 0 : existingBranchList.stream().mapToInt(b -> Integer.parseInt(b.getBranchCode().substring(6))).max().orElse(0);

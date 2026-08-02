@@ -29,8 +29,11 @@ public class UserSubscription implements Serializable {
 	private int id;
     
     private int ownerId;
+    private String branchCode;
     
     private boolean status;
+    
+    private boolean active;
 
     private String subscriptionName;
     
@@ -57,6 +60,9 @@ public class UserSubscription implements Serializable {
     private int userCount; 
     
     private LocalDateTime createdAt;
+    
+    private LocalDateTime subscriptionStartAt;
+    private int subscriptionDuration;
    
     private String permissions;
     

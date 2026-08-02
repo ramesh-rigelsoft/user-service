@@ -11,6 +11,7 @@ import com.rigel.user.dao.IRolesManagementDao;
 import com.rigel.user.dao.ISubscriptionPlanDao;
 import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.UserSubscription;
+import com.rigel.user.model.UserSubscriptionLog;
 import com.rigel.user.service.ISubscriptionPlanService;
 import com.rigel.user.util.PagePermission;
 
@@ -34,6 +35,7 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 			            .subscriptionCode("RASUB01")
 			            .subscriptionType("YEARILY")
 			            .amountPerMonth(899.0)
+			            .branchCount(1)
 			            .month(12)
 			            .gst(1941.84)
 			            .totalAmount(12729.84)
@@ -55,7 +57,7 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 			            ).stream().collect(java.util.stream.Collectors.joining(",")))      
 			            .SUKCount(5000)
 			            .isMultipleBranch(false)
-			            .perBranchUser(0)
+			            .perBranchUser(1)
 			            .isMultipleUser(true)
 			            .userCount(1)
 			            .isReplaceItem(true)
@@ -86,7 +88,8 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 			                    PagePermission.EXPENSE_VIEW
 			            ).stream().collect(java.util.stream.Collectors.joining(",")))
 			            .isMultipleBranch(true)
-			            .perBranchUser(0)
+			            .perBranchUser(1)
+			            .branchCount(1)
 			            .isMultipleUser(true)
 			            .userCount(1)
 			            .isReplaceItem(false)
@@ -126,7 +129,7 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 			            ).stream().collect(java.util.stream.Collectors.joining(",")))      
 			            .SUKCount(50000)
 			            .isMultipleBranch(false)
-			            .perBranchUser(0)
+			            .perBranchUser(1)
 			            .isMultipleUser(true)
 			            .userCount(1)
 			            .isReplaceItem(true)
@@ -147,13 +150,23 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 	}
 
 	@Override
-	public UserSubscription getSubscriptionPlanByOwnerId(Integer ownerId) {
-		return rolesManagementDao.getSubscriptionPlanByOwnerId(ownerId);
+	public UserSubscription getSubscriptionPlanByOwnerId(Integer ownerId,String branchCode) {
+		return rolesManagementDao.getSubscriptionPlanByOwnerId(ownerId,branchCode);
 	}
 
 	@Override
 	public UserSubscription saveUserSubscriptionPlan(UserSubscription userSubscriptionPlan) {
 		return subscriptionPlanDao.saveUserSubscription(userSubscriptionPlan);
+	}
+
+	@Override
+	public void deactivateSubscription(Integer ownerId, String branchCode) {
+		 subscriptionPlanDao.deactivateSubscription(ownerId, branchCode);		
+	}
+
+	@Override
+	public UserSubscriptionLog saveUserSubscriptionLogPlan(UserSubscriptionLog userSubscriptionPlan) {
+		return subscriptionPlanDao.saveUserSubscriptionLogPlan(userSubscriptionPlan);
 	}
 
 }

@@ -106,6 +106,24 @@ public class UserDaoimpl implements IUserDao {
 		return entityManager.createQuery(jpql, User.class).setParameter("ownerId", searchCriteria.getUserId())
 				.getResultList();
 	}
+	
+	@Override
+	public List<User> findUsersByOwnerIdAndBranch(SearchCriteria searchCriteria) {
+
+		String jpql = """
+				SELECT DISTINCT u
+				FROM User u
+				WHERE LOWER(u.role) <> 'admin'
+				AND status=1
+				AND u.ownerId = :ownerId
+				AND u.branchCode = :branchCode
+				""";
+
+		return entityManager.createQuery(jpql, User.class)
+				.setParameter("ownerId", searchCriteria.getUserId())
+				.setParameter("branchCode", searchCriteria.getBranchCode())
+				.getResultList();
+	}
 
 	@Override
 	public UserSubscription saveUserSubscription(UserSubscription userSubscription) {

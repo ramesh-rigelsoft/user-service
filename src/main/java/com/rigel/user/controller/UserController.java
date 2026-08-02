@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.io.*;
 import java.nio.file.Files;
@@ -51,12 +52,14 @@ import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
 import com.rigel.user.model.UserSubscription;
+import com.rigel.user.model.UserSubscriptionLog;
 import com.rigel.user.model.VerifyKeyRequest;
 import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.ResetPasswordRequest;
 import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.model.dto.SubscriptionPlanDto;
 import com.rigel.user.model.dto.UserDto;
+import com.rigel.user.model.dto.UserSubscriptionDto;
 import com.rigel.user.security.JwtTokenUtil;
 import com.rigel.user.security.JwtUser;
 import com.rigel.user.service.IRolesManagementService;
@@ -102,7 +105,6 @@ public class UserController {
 	@Autowired
 	ISubscriptionPlanService subscriptionPlanService;
 	
-
 //	@Autowired
 //	private IUserLogOutIn userLogOutIn;
 //
@@ -300,27 +302,21 @@ public class UserController {
 		} else if (!(User.PASSWORD_ENCODER.matches(login.getPassword(), user.getPassword()))) {
 			throw new TaskTitleException("Wrong password");
 		} else {
-
 			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 			final String token = jwtTokenUtil.generateToken(userDetails, request);
 			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
 			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
-			UserSubscription subscriptionPlan=subscriptionPlanService.getSubscriptionPlanByOwnerId(user.getOwnerId());
-			SubscriptionPlanDto subscriptionPlanDto=objectMapper.convertValue(subscriptionPlan, SubscriptionPlanDto.class);
-			System.out.println(user.getBranchCode());
+			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(user.getOwnerId(), login.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
 			data.put("access_token", token);
 			data.put("user", user);
 			data.put("page_access", menuDto);
-			data.put("subscription_plan", subscriptionPlanDto);
+			data.put("subscription_plan", userSubscriptionDto);
 			response.put("data", data);
 			response.put("status", "OK");
 			response.put("code", "200");
 			response.put("message", "Your account has been logined successfully.");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
-//		else {
-//			throw new TaskTitleException("Your are recently changed the System");
-//		}
 	}
 
 	@RequestMapping(value = "key/verify", method = RequestMethod.POST)
@@ -436,13 +432,54 @@ public class UserController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			SubscriptionPlan subscription = rolesManagementService.findBySubscriptionCode(searchCriteria.getSubscriptionCode());
+			String branchCode=searchCriteria.getBranchCode();
+			int ownerId=searchCriteria.getUserId();
+			String subScriptionCode=searchCriteria.getSubscriptionCode();
 			
-			UserSubscription userSubscription=objectMapper.convertValue(subscription, UserSubscription.class);
-			userSubscription.setOwnerId(searchCriteria.getUserId());
-			userSubscription.setCreatedAt(LocalDateTime.now());
-			userSubscription = subscriptionPlanService.saveUserSubscriptionPlan(userSubscription);
-			data.put("userSubscription", userSubscription);
+			UserSubscription userSubscription=subscriptionPlanService.getSubscriptionPlanByOwnerId(searchCriteria.getUserId(),searchCriteria.getBranchCode());
+			if(userSubscription!=null&&userSubscription.isStatus()) {
+				throw new BadGatewayRequest("You already have an active subscription.");
+			}else {
+				if(userSubscription!=null&&userSubscription.getSubscriptionCode().equalsIgnoreCase(subScriptionCode)) {
+					userSubscription.setSubscriptionStartAt(LocalDateTime.now());
+					userSubscription.setStatus(true);
+					userSubscription=subscriptionPlanService.saveUserSubscriptionPlan(userSubscription);
+					UserSubscriptionDto UserSubscriptionDto1=objectMapper.convertValue(userSubscription, UserSubscriptionDto.class);
+					data.put("userSubscription", UserSubscriptionDto1);
+					
+					//log
+					UserSubscriptionLog userSubscriptionLog=objectMapper.convertValue(UserSubscriptionDto1, UserSubscriptionLog.class);
+					userSubscriptionLog.setId(null);
+					subscriptionPlanService.saveUserSubscriptionLogPlan(userSubscriptionLog);
+				
+				}else {
+					if(userSubscription!=null) {
+						userSubscription.setActive(false);
+						subscriptionPlanService.saveUserSubscriptionPlan(userSubscription);
+					}
+					SubscriptionPlan subscriptionPlan=rolesManagementService.findBySubscriptionCode(subScriptionCode);
+					if(subscriptionPlan==null) {
+						throw new BadGatewayRequest("Invalid subscription Code.");
+					}
+					SubscriptionPlanDto subscription = objectMapper.convertValue(subscriptionPlan,SubscriptionPlanDto.class);
+					UserSubscription userSubscriptionNew=objectMapper.convertValue(subscription, UserSubscription.class);
+					userSubscriptionNew.setCreatedAt(LocalDateTime.now());
+					userSubscriptionNew.setSubscriptionStartAt(LocalDateTime.now());
+					userSubscriptionNew.setBranchCode(branchCode);
+					userSubscriptionNew.setOwnerId(ownerId);
+					userSubscriptionNew.setActive(true);
+					userSubscriptionNew.setStatus(true);
+					userSubscriptionNew = subscriptionPlanService.saveUserSubscriptionPlan(userSubscriptionNew);
+					UserSubscriptionDto UserSubscriptionDto2=objectMapper.convertValue(userSubscriptionNew, UserSubscriptionDto.class);
+					data.put("userSubscription", UserSubscriptionDto2);
+					//log
+					UserSubscriptionLog userSubscriptionLog=objectMapper.convertValue(UserSubscriptionDto2, UserSubscriptionLog.class);
+					userSubscriptionLog.setId(null);
+					subscriptionPlanService.saveUserSubscriptionLogPlan(userSubscriptionLog);
+					
+					
+				}
+			}
 			response.put("data", data);
 			response.put("status", "CREATED");
 			response.put("code", "201");
