@@ -50,6 +50,7 @@ import com.rigel.user.model.Roles;
 import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
+import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.VerifyKeyRequest;
 import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.ResetPasswordRequest;
@@ -59,6 +60,7 @@ import com.rigel.user.model.dto.UserDto;
 import com.rigel.user.security.JwtTokenUtil;
 import com.rigel.user.security.JwtUser;
 import com.rigel.user.service.IRolesManagementService;
+import com.rigel.user.service.ISubscriptionPlanService;
 import com.rigel.user.service.IUserLogOutIn;
 import com.rigel.user.service.IUserService;
 import com.rigel.user.serviceimpl.EmailService;
@@ -96,6 +98,9 @@ public class UserController {
 	
 	@Autowired
 	private IRolesManagementService rolesManagementService;
+	
+	@Autowired
+	ISubscriptionPlanService subscriptionPlanService;
 	
 
 //	@Autowired
@@ -300,7 +305,7 @@ public class UserController {
 			final String token = jwtTokenUtil.generateToken(userDetails, request);
 			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
 			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
-			SubscriptionPlan subscriptionPlan=rolesManagementService.findBySubscriptionCode(user.getSubscriptionCode());
+			UserSubscription subscriptionPlan=subscriptionPlanService.getSubscriptionPlanByOwnerId(user.getOwnerId());
 			SubscriptionPlanDto subscriptionPlanDto=objectMapper.convertValue(subscriptionPlan, SubscriptionPlanDto.class);
 			System.out.println(user.getBranchCode());
 			data.put("access_token", token);
@@ -417,5 +422,32 @@ public class UserController {
 	    response.put("code", 200);
 	    response.put("message", "Success");
 	    return ResponseEntity.ok(response);
+	}
+	
+	@PostMapping(value = "userSubscription")
+	public ResponseEntity<Map<String, Object>> userSubscription(
+			@RequestBody(required = true) @Valid SearchCriteria searchCriteria, BindingResult result,
+			HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+
+		if (searchCriteria == null) {
+			throw new BadGatewayRequest("Invalid Request");
+		} else if (result.hasFieldErrors()) {
+			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+		} else {
+			SubscriptionPlan subscription = rolesManagementService.findBySubscriptionCode(searchCriteria.getSubscriptionCode());
+			
+			UserSubscription userSubscription=objectMapper.convertValue(subscription, UserSubscription.class);
+			userSubscription.setOwnerId(searchCriteria.getUserId());
+			userSubscription.setCreatedAt(LocalDateTime.now());
+			userSubscription = subscriptionPlanService.saveUserSubscriptionPlan(userSubscription);
+			data.put("userSubscription", userSubscription);
+			response.put("data", data);
+			response.put("status", "CREATED");
+			response.put("code", "201");
+			response.put("message", "Subscription has been created successfully.");
+			return new ResponseEntity<>(response, HttpStatus.CREATED);
+		}
 	}
 }

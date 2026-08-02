@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.rigel.user.dao.IRolesManagementDao;
+import com.rigel.user.dao.ISubscriptionPlanDao;
 import com.rigel.user.model.SubscriptionPlan;
+import com.rigel.user.model.UserSubscription;
 import com.rigel.user.service.ISubscriptionPlanService;
 import com.rigel.user.util.PagePermission;
 
@@ -17,6 +19,9 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 	
 	@Autowired
 	IRolesManagementDao rolesManagementDao;
+	
+	@Autowired
+	ISubscriptionPlanDao subscriptionPlanDao;
 
 	@Override
 	public SubscriptionPlan saveSubscriptionPlan() {
@@ -139,6 +144,16 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 			});
 		
 		return null;
+	}
+
+	@Override
+	public UserSubscription getSubscriptionPlanByOwnerId(Integer ownerId) {
+		return rolesManagementDao.getSubscriptionPlanByOwnerId(ownerId);
+	}
+
+	@Override
+	public UserSubscription saveUserSubscriptionPlan(UserSubscription userSubscriptionPlan) {
+		return subscriptionPlanDao.saveUserSubscription(userSubscriptionPlan);
 	}
 
 }

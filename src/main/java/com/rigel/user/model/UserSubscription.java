@@ -19,18 +19,22 @@ import com.rigel.user.util.PagePermission;
 @Getter
 @Setter
 @Entity
-@Table(name = "subscription_plan")
-public class SubscriptionPlan implements Serializable {
+@Table(name = "user_subscription")
+public class UserSubscription implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+    
+    private int ownerId;
+    
+    private boolean status;
 
     private String subscriptionName;
     
-    @Column(unique = true)
+ 
     private String subscriptionCode;   // SUB01
 
     private String subscriptionType;   // Monthaly,Qutarily,HelfYerily,Yerily
@@ -53,10 +57,7 @@ public class SubscriptionPlan implements Serializable {
     private int userCount; 
     
     private LocalDateTime createdAt;
-    
-    private boolean status;
    
-    @Column(name = "permissions")
     private String permissions;
     
     private boolean isReplaceItem;
@@ -67,5 +68,6 @@ public class SubscriptionPlan implements Serializable {
     private boolean isDownloadExcelSales;
     private boolean isDownloadExcelEntryItem;
     private int SUKCount;
+
       
 }

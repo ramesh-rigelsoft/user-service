@@ -6,6 +6,7 @@ import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
 import com.rigel.user.model.SubscriptionPlan;
+import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.SearchCriteria;
 
@@ -30,6 +31,8 @@ public interface IRolesManagementDao {
     // subcription management
 	public SubscriptionPlan saveSubscriptionPlan(SubscriptionPlan subscription);
 	public SubscriptionPlan findBySubscriptionCode(String code);
+	
+	public UserSubscription getSubscriptionPlanByOwnerId(Integer ownerId);
 
 
 }

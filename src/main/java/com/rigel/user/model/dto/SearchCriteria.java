@@ -52,6 +52,7 @@ public class SearchCriteria {
 	private int userId;
 	private int roleId;
 	private int pageId;
+	private String subscriptionCode;
 	
 	
 }

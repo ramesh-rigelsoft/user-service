@@ -1,44 +1,36 @@
 package com.rigel.user.controller;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rigel.user.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.user.annotation.ApiSecured;
 import com.rigel.user.exception.BadGatewayRequest;
-import com.rigel.user.exception.TaskTitleException;
 import com.rigel.user.model.OfficeBranch;
-import com.rigel.user.model.Pages;
-import com.rigel.user.model.RolesPagePermision;
-import com.rigel.user.model.User;
+import com.rigel.user.model.SubscriptionPlan;
+import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.dto.OfficeBranchDto;
-import com.rigel.user.model.dto.RolesPagePermisionDto;
 import com.rigel.user.model.dto.SearchCriteria;
-import com.rigel.user.model.dto.UserDto;
 import com.rigel.user.service.IRolesManagementService;
+import com.rigel.user.service.ISubscriptionPlanService;
 import com.rigel.user.service.IUserService;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/branch/")
@@ -56,6 +48,9 @@ public class OfficeBranchController {
 
 	@Autowired
 	IUserService userService;
+	
+	@Autowired
+	ISubscriptionPlanService subscriptionPlanService;
 
 	@PostMapping(value = "save")
 	public ResponseEntity<Map<String, Object>> save(
@@ -69,6 +64,7 @@ public class OfficeBranchController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
+			UserSubscription subscriptionPlan=subscriptionPlanService.getSubscriptionPlanByOwnerId(officeBranchDto.getOwnerId());
 			if (officeBranchDto.getId() != null&&!officeBranchDto.getId().isBlank()&&officeBranchDto.getId().length()>10) {
 				OfficeBranch existingBranch = rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(officeBranchDto.getOwnerId()).itemId(officeBranchDto.getId()).build()).stream().findFirst().orElse(null);
 				existingBranch.setBranchName(officeBranchDto.getBranchName());
@@ -80,6 +76,9 @@ public class OfficeBranchController {
 				data.put("branch", officeBranchDto);
 			} else {
 				List<OfficeBranch> existingBranchList = rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(officeBranchDto.getOwnerId()).build());
+				if(existingBranchList.size() > subscriptionPlan.getBranchCount()-1) {
+					throw new BadGatewayRequest("You have reached the maximum number of branches allowed by your subscription plan.");
+				}
 				int maxNo = existingBranchList == null ? 0 : existingBranchList.stream().mapToInt(b -> Integer.parseInt(b.getBranchCode().substring(6))).max().orElse(0);
 				OfficeBranch officeBranch = objectMapper.convertValue(officeBranchDto,OfficeBranch.class);
 				officeBranch.setId(null);

@@ -4,11 +4,14 @@ import java.util.List;
 
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
+import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.dto.SearchCriteria;
 
 public interface IUserDao {
 	
     public User saveUser(User user);
+    
+    public UserSubscription saveUserSubscription(UserSubscription userSubscription);
     
     public User saveSubUser(User user);
     

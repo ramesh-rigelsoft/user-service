@@ -13,6 +13,7 @@ import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Pages;
 import com.rigel.user.model.RolesPagePermision;
 import com.rigel.user.model.SubscriptionPlan;
+import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.dto.MenuDto;
 import com.rigel.user.model.dto.SearchCriteria;
 
@@ -305,6 +306,16 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 
 
 	    return result;
+	}
+
+	@Override
+	public UserSubscription getSubscriptionPlanByOwnerId(Integer ownerId) {
+
+	    return entityManager.createQuery(
+	            "FROM UserSubscription s WHERE s.ownerId = :ownerId",
+	            UserSubscription.class)
+	    		 .setParameter("ownerId", ownerId)
+		           .getSingleResult();
 	}
 
 }

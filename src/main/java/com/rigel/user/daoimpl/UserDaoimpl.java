@@ -15,6 +15,7 @@ import com.rigel.user.dao.IUserDao;
 import com.rigel.user.model.Roles;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserOtp;
+import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.dto.SearchCriteria;
 
 @Repository
@@ -104,6 +105,11 @@ public class UserDaoimpl implements IUserDao {
 
 		return entityManager.createQuery(jpql, User.class).setParameter("ownerId", searchCriteria.getUserId())
 				.getResultList();
+	}
+
+	@Override
+	public UserSubscription saveUserSubscription(UserSubscription userSubscription) {
+		return entityManager.merge(userSubscription);
 	}
 
 	
