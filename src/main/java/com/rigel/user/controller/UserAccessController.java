@@ -139,7 +139,7 @@ public class UserAccessController {
 			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(userDtoReq.getOwnerId(), userDtoReq.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
 			
 			List<User> users = userService.findUsersByOwnerIdAndBranch(SearchCriteria.builder().branchCode(userDtoReq.getBranchCode()).userId(userDtoReq.getOwnerId()).build());
-			if((users.size()+1) > userSubscriptionDto.getPerBranchUser()) {
+			if((users.size()) > userSubscriptionDto.getPerBranchUser()) {
 				throw new TaskTitleException("Max number of user already has been created in this Office");
 			}
 			
