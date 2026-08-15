@@ -31,8 +31,8 @@ public class TaskException {
             public ResponseEntity<Map<String,Object>> taskTitleException(
                     TaskTitleException exception) {
 
-//                System.out.println("========== TASK EXCEPTION ==========");
-//                System.out.println("Message = " + exception.getMessage());
+                System.out.println("========== TASK EXCEPTION ==========");
+                System.out.println("Message = " + exception.getMessage());
 
                 HashMap<String, Object> response = new HashMap<>();
                 HashMap<String, Object> data = new HashMap<>();
@@ -42,7 +42,7 @@ public class TaskException {
                 response.put("code", "400");
                 response.put("message", exception.getMessage());
 
-//                System.out.println("Response = " + response);
+                System.out.println("Response = " + response);
 
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }

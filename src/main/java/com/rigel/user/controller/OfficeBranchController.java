@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.user.annotation.ApiSecured;
 import com.rigel.user.exception.BadGatewayRequest;
+import com.rigel.user.exception.TaskTitleException;
 import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.User;
@@ -67,11 +68,7 @@ public class OfficeBranchController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			Object logo = officeBranchDto.getLogo();
-
-			System.out.println("Logo: " + logo);
-			System.out.println("Type: " + (logo != null ? logo.getClass().getName() : "null"));
-
+						
 //			UserSubscription subscriptionPlan=subscriptionPlanService.getSubscriptionPlanByOwnerId(officeBranchDto.getOwnerId());
 			if (officeBranchDto.getId() != null&&!officeBranchDto.getId().isBlank()&&officeBranchDto.getId().length()>10) {
 				OfficeBranch existingBranch = rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(officeBranchDto.getOwnerId()).itemId(officeBranchDto.getId()).build()).stream().findFirst().orElse(null);
@@ -94,14 +91,16 @@ public class OfficeBranchController {
 				if(fileName!=null) {
 				  existingBranch.setBranchLogo(fileName);
 				}
-				rolesManagementService.updateOfficeBranch(existingBranch);
+				existingBranch=rolesManagementService.updateOfficeBranch(existingBranch);				
+//				System.out.println("Logo: " + logo);
+//				System.out.println("Type: " + (logo != null ? logo.getClass().getName() : "null"));
 				officeBranchDto.setLogo(null);
-				data.put("branch", officeBranchDto);
+				data.put("branch", existingBranch);
 			} else {
 				User user=userService.findUserById(officeBranchDto.getOwnerId());
 				List<OfficeBranch> existingBranchList = rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(officeBranchDto.getOwnerId()).build());
 				if((existingBranchList.size()+1) > user.getBranchCount()) {
-					throw new BadGatewayRequest("You have reached the maximum number of branches allowed by your subscription plan.");
+					throw new TaskTitleException("You have reached the maximum number of branches allowed by your subscription plan.");
 				}
 				int maxNo = existingBranchList == null ? 0 : existingBranchList.stream().mapToInt(b -> Integer.parseInt(b.getBranchCode().substring(6))).max().orElse(0);
 				OfficeBranch officeBranch = objectMapper.convertValue(officeBranchDto,OfficeBranch.class);
@@ -112,6 +111,8 @@ public class OfficeBranchController {
 					officeBranch.setBranchLogo(fileName);
 				}
 				officeBranch = rolesManagementService.saveOfficeBranch(officeBranch);
+//				System.out.println("Logo: " + logo);
+//				System.out.println("Type: " + (logo != null ? logo.getClass().getName() : "null"));
 				data.put("branch", officeBranch);
 			}
 			response.put("data", data);
