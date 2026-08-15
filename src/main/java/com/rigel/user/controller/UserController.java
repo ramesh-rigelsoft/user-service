@@ -248,18 +248,21 @@ public class UserController {
 //			String fileName = userDtoReq.getLogo() == null ? null
 //					: UploadFileUtlity.uploadFiles(userDtoReq.getLogo(), "logo", null);
 			User user = modelMapper.map(userDtoReq, User.class);
-//			user.setLogo(fileName);
-			User user2 = userService.findUserByEmailId(user.getMobile_no(),userDtoReq.getId());
+            String adminEmail=user.getEmail_id()+"|admin";
+            String adminMobileNo=user.getMobile_no()+"|admin";
+			User user2 = userService.findUserByEmailId(adminMobileNo,userDtoReq.getId());
 			if(user2!=null){
 				throw new TaskTitleException("Mobile Number already registered with us.");
 			}
-			User user1 = userService.findUserByEmailId(user.getEmail_id(),userDtoReq.getId());
+			User user1 = userService.findUserByEmailId(adminEmail,userDtoReq.getId());
 			if (user1 == null) {
 				if(user.getId()<1){
 					user.setStatus(1);
 					user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
 					user.setCreated_at(new Timestamp(new Date().getTime()));
 //					user.setLogo(fileName);
+					user.setEmail_id(adminEmail);
+					user.setMobile_no(adminMobileNo);
 					user.setRole("admin");
 					user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
 					user = userService.persistUser(user);
@@ -291,13 +294,42 @@ public class UserController {
 		}
 	}
 	
+	@RequestMapping(value = "adminLogin", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> adminLogin(@RequestBody(required = true) @Valid LoginRequest login,
+			HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+		String username=login.getUsername()+"|admin";
+        User user = userService.findUserByEmailId(username,0);
+		if (user == null) {
+			throw new TaskTitleNotFound("Email id not existing with us.");
+		} else if (!(User.PASSWORD_ENCODER.matches(login.getPassword(), user.getPassword()))) {
+			throw new TaskTitleException("Wrong password");
+		} else {
+			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
+			final String token = jwtTokenUtil.generateToken(userDetails, request);
+			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
+			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
+			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(user.getOwnerId(), login.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
+			data.put("access_token", token);
+			data.put("user", user);
+			data.put("page_access", menuDto);
+			data.put("subscription_plan", userSubscriptionDto);
+			response.put("data", data);
+			response.put("status", "OK");
+			response.put("code", "200");
+			response.put("message", "Your account has been logined successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
 	
 	@RequestMapping(value = "login", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> login(@RequestBody(required = true) @Valid LoginRequest login,
 			HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
-		User user = userService.findUserByEmailId(login.getUsername(),0);
+		String username=login.getUsername();
+        User user = userService.findUserByEmailId(username,0);
 		if (user == null) {
 			throw new TaskTitleNotFound("Email id not existing with us.");
 		} else if (!(User.PASSWORD_ENCODER.matches(login.getPassword(), user.getPassword()))) {
@@ -332,10 +364,7 @@ public class UserController {
 			response.put("message", "Email id not existing with us.");
 			return new ResponseEntity<>(response, HttpStatus.BAD_GATEWAY);
 		} else if (user.getSoftwareKey().equalsIgnoreCase(verifyKeyRequest.getSoftwareKey())) {
-//			user.setSoftwareInstalationCount(user.getSoftwareInstalationCount()+1);
-			user.setMacAddress(
-					verifyKeyRequest.getMacAddress() + user.getMacAddress() != null ? ("|" + user.getMacAddress())
-							: "");
+
 			userService.saveUser(user);
 			response.put("status", "OK");
 			response.put("code", "200");
