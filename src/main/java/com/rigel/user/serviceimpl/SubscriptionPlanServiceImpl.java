@@ -12,6 +12,7 @@ import com.rigel.user.dao.ISubscriptionPlanDao;
 import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.UserSubscriptionLog;
+import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.service.ISubscriptionPlanService;
 import com.rigel.user.util.PagePermission;
 
@@ -167,6 +168,16 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 	@Override
 	public UserSubscriptionLog saveUserSubscriptionLogPlan(UserSubscriptionLog userSubscriptionPlan) {
 		return subscriptionPlanDao.saveUserSubscriptionLogPlan(userSubscriptionPlan);
+	}
+
+	@Override
+	public List<SubscriptionPlan> subscriptionPlanList() {
+		return subscriptionPlanDao.subscriptionPlanList();
+	}
+
+	@Override
+	public List<UserSubscription> userSubscriptionPlanList(SearchCriteria searchCriteria) {
+		return subscriptionPlanDao.userSubscriptionPlanList(searchCriteria);
 	}
 
 }

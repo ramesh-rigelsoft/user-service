@@ -136,8 +136,12 @@ public class UserAccessController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(userDtoReq.getOwnerId(), userDtoReq.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
-			
+			UserSubscription subscription = subscriptionPlanService.getSubscriptionPlanByOwnerId(userDtoReq.getOwnerId(), userDtoReq.getBranchCode());
+			if (subscription == null) {
+				throw new TaskTitleException("You have not subscribed to any plan");
+			}
+			UserSubscriptionDto userSubscriptionDto = objectMapper.convertValue(subscription,UserSubscriptionDto.class);
+		
 			List<User> users = userService.findUsersByOwnerIdAndBranch(SearchCriteria.builder().branchCode(userDtoReq.getBranchCode()).userId(userDtoReq.getOwnerId()).build());
 			if((users.size()) > userSubscriptionDto.getPerBranchUser()) {
 				throw new TaskTitleException("Max number of user already has been created in this Office");
@@ -189,5 +193,32 @@ public class UserAccessController {
 			response.put("message", "Users has been fetch successfully.");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
+	}
+	
+	@PostMapping(value = "subscriptionList")
+	public ResponseEntity<Map<String, Object>> subscriptionList() {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+			List<SubscriptionPlan> subscriptionPlanList = subscriptionPlanService.subscriptionPlanList();
+			data.put("subscriptionPlanList", subscriptionPlanList);
+			response.put("data", data);
+			response.put("status", "OK");
+			response.put("code", "200");
+			response.put("message", "Users has been fetch successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "userSubscriptionList")
+	public ResponseEntity<Map<String, Object>> userSubscriptionList(@RequestBody(required = true) @Valid SearchCriteria searchCriteria, BindingResult result,
+			HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+			List<UserSubscription> subscriptionPlanList = subscriptionPlanService.userSubscriptionPlanList(searchCriteria);
+			data.put("mysubscriptionList", subscriptionPlanList);
+			response.put("data", data);
+			response.put("status", "OK");
+			response.put("code", "200");
+			response.put("message", "Users has been fetch successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

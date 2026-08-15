@@ -35,6 +35,9 @@ public class SubscriptionPlan implements Serializable {
 
     private String subscriptionType;   // Monthaly,Qutarily,HelfYerily,Yerily
 
+//    private int perDayPhoneSale; 
+//    private int perDayLaptopSale; 
+    
     private Double amountPerMonth;
     private int month;
     private Double gst;

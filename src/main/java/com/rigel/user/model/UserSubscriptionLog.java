@@ -59,6 +59,9 @@ public class UserSubscriptionLog implements Serializable {
     
     private int userCount; 
     
+//    private int perDayPhoneSale; 
+//    private int perDayLaptopSale; 
+    
     private LocalDateTime createdAt;
     
     private LocalDateTime subscriptionStartAt;
