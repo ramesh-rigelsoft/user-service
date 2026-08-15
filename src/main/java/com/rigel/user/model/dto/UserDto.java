@@ -54,34 +54,14 @@ public class UserDto {
 	private Date lastPasswordResetDate;
 	private int branchCount;
 	
-    // ================= COMPANY INFO =================
-	private String shopType;
-	private String softwareType;
-    private String companyName;
-    private String companyLogo;
-
-    private String gstNumber;
-    private String panNumber;
-    private String cinNumber;
-
-    private String addressLine1;
-    private String addressLine2;
-    private String city;
-    private String state;
-    private String country;
-    private String pincode;
-
-    private String website;
-    private String companyType; // Pvt Ltd, LLP, Proprietor, etc.
-    private Integer companyEmployeeCount;
+    
     // ================= RELATION =================
     
     private int ownerId;
     private String branchCode;
     private String branchName;
     
-    private String subscriptionCode;
 
-    private MultipartFile logo;
+    private MultipartFile profilePhoto;
 }
 

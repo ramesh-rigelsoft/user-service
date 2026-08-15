@@ -244,7 +244,7 @@ public class UserController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			System.out.println("userDtoReq.getLogo()" + userDtoReq.getLogo());
+//			System.out.println("userDtoReq.getLogo()" + userDtoReq.getProfilePhoto());
 //			String fileName = userDtoReq.getLogo() == null ? null
 //					: UploadFileUtlity.uploadFiles(userDtoReq.getLogo(), "logo", null);
 			User user = modelMapper.map(userDtoReq, User.class);
@@ -290,7 +290,8 @@ public class UserController {
 			}
 		}
 	}
-
+	
+	
 	@RequestMapping(value = "login", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> login(@RequestBody(required = true) @Valid LoginRequest login,
 			HttpServletRequest request) {

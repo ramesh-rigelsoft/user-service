@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.rigel.user.model.User;
@@ -28,12 +30,12 @@ public class OfficeBranchDto  {
 
     private String branchCode;   // Travel, Food, Salary etc.
 
-    @NotBlank(message = "Branch Name is required")
+    @NotNull(message = "Branch Name is required")
     private String branchName;  // Personal / Business
 
     @Column(length = 300)
+    @NotNull(message = "Branch Name is required")
     private String address;
-
    
     private int ownerId; // reference to the user/owner
     
@@ -43,6 +45,23 @@ public class OfficeBranchDto  {
     private boolean status;
     private String additionalDetails;
     
- 	private User user;
+    // company info
+    @NotNull(message = "ShopType is required")
+    private String shopType;
+
+	private String gstNumber;
+	private String panNumber;
+	private String cinNumber;
+
+    @NotNull(message = "City Name is required")
+	private String city;
+    
+    @NotNull(message = "State Name is required")
+	private String state;
+    
+    @NotNull(message = "Pincode is required")
+	private String pincode;
+	
+	private MultipartFile logo;
  
 }

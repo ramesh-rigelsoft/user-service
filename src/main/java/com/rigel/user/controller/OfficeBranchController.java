@@ -9,8 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,7 @@ import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.service.IRolesManagementService;
 import com.rigel.user.service.ISubscriptionPlanService;
 import com.rigel.user.service.IUserService;
+import com.rigel.user.util.UploadFileUtlity;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,9 +56,8 @@ public class OfficeBranchController {
 	@Autowired
 	ISubscriptionPlanService subscriptionPlanService;
 
-	@PostMapping(value = "save")
-	public ResponseEntity<Map<String, Object>> save(
-			@RequestBody(required = true) @Valid OfficeBranchDto officeBranchDto, BindingResult result,
+	@PostMapping(value = "save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<Map<String, Object>> save(@ModelAttribute @Valid OfficeBranchDto officeBranchDto, BindingResult result,
 			HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
@@ -65,6 +67,11 @@ public class OfficeBranchController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
+			Object logo = officeBranchDto.getLogo();
+
+			System.out.println("Logo: " + logo);
+			System.out.println("Type: " + (logo != null ? logo.getClass().getName() : "null"));
+
 //			UserSubscription subscriptionPlan=subscriptionPlanService.getSubscriptionPlanByOwnerId(officeBranchDto.getOwnerId());
 			if (officeBranchDto.getId() != null&&!officeBranchDto.getId().isBlank()&&officeBranchDto.getId().length()>10) {
 				OfficeBranch existingBranch = rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(officeBranchDto.getOwnerId()).itemId(officeBranchDto.getId()).build()).stream().findFirst().orElse(null);
@@ -73,7 +80,22 @@ public class OfficeBranchController {
 				existingBranch.setAdditionalDetails(officeBranchDto.getAdditionalDetails());
 				existingBranch.setStatus(officeBranchDto.isStatus());
 				existingBranch.setUpdatedAt(LocalDateTime.now());
+				
+				existingBranch.setCinNumber(officeBranchDto.getCinNumber());
+				existingBranch.setShopType(officeBranchDto.getShopType());
+				existingBranch.setGstNumber(officeBranchDto.getGstNumber());
+				existingBranch.setPanNumber(officeBranchDto.getPanNumber());
+				existingBranch.setState(officeBranchDto.getState());
+				existingBranch.setCity(officeBranchDto.getCity());
+				existingBranch.setPincode(officeBranchDto.getPincode());
+				
+				String fileName = UploadFileUtlity.uploadLogo(officeBranchDto.getLogo(),existingBranch.getBranchCode());
+
+				if(fileName!=null) {
+				  existingBranch.setBranchLogo(fileName);
+				}
 				rolesManagementService.updateOfficeBranch(existingBranch);
+				officeBranchDto.setLogo(null);
 				data.put("branch", officeBranchDto);
 			} else {
 				User user=userService.findUserById(officeBranchDto.getOwnerId());
@@ -85,6 +107,10 @@ public class OfficeBranchController {
 				OfficeBranch officeBranch = objectMapper.convertValue(officeBranchDto,OfficeBranch.class);
 				officeBranch.setId(null);
 				officeBranch.setBranchCode("BRT"+String.format("%03d",officeBranch.getOwnerId())+String.format("%02d", maxNo+1));
+				String fileName = UploadFileUtlity.uploadLogo(officeBranchDto.getLogo(),officeBranch.getBranchCode());
+				if(fileName!=null) {
+					officeBranch.setBranchLogo(fileName);
+				}
 				officeBranch = rolesManagementService.saveOfficeBranch(officeBranch);
 				data.put("branch", officeBranch);
 			}
