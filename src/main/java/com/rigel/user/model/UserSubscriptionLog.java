@@ -69,6 +69,16 @@ public class UserSubscriptionLog implements Serializable {
    
     private String permissions;
     
+    
+    private boolean isRepaireAllow;
+    private boolean isSalesAllow;
+    private boolean isEmployeeAllow;
+    
+    private Integer perDayRepaireCount;
+    private Integer perDayMobileSmartDevicesSalesCount; // mobile shop
+    private Integer perDayComputerLaptopSalesCount;// laptop computer shop
+    private Integer perDayNormalTypeSalesCount; // electronic shop
+      
     private boolean isReplaceItem;
     private boolean isReturnItem;
     private boolean isDownloadInvoice;

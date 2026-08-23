@@ -76,24 +76,28 @@ public class UserAccessController {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
 			System.out.println("rolesAccess.getId()-------------"+rolesAccess.getId());
-			if (rolesAccess.getId() != null) {
-				RolesPagePermision existingRolesPagePermision = rolesManagementService.findRolesPagePermissionById(rolesAccess.getId());
-				
-				existingRolesPagePermision.setCanAll(rolesAccess.isCanAll());
-				existingRolesPagePermision.setCanView(rolesAccess.isCanView());
-				existingRolesPagePermision.setCanCreate(rolesAccess.isCanCreate());
-				existingRolesPagePermision.setCanEdit(rolesAccess.isCanEdit());
-				existingRolesPagePermision.setCanDelete(rolesAccess.isCanDelete());
-				
-				existingRolesPagePermision.setBranchCode(rolesAccess.getBranchCode());
-				
-				existingRolesPagePermision = rolesManagementService.saveRolesPagePermission(existingRolesPagePermision);
-				data.put("access", existingRolesPagePermision);
-			} else {
-				RolesPagePermision rolesPagePermision = objectMapper.convertValue(rolesAccess, RolesPagePermision.class);
-				rolesPagePermision.setId(null);
-				rolesPagePermision = rolesManagementService.saveRolesPagePermission(rolesPagePermision);
-				data.put("access", rolesPagePermision);
+			try {
+				if (rolesAccess.getId() != null) {
+			
+					RolesPagePermision existingRolesPagePermision = rolesManagementService.findRolesPagePermissionById(rolesAccess.getId());
+					existingRolesPagePermision.setCanAll(rolesAccess.isCanAll());
+					existingRolesPagePermision.setCanView(rolesAccess.isCanView());
+					existingRolesPagePermision.setCanCreate(rolesAccess.isCanCreate());
+					existingRolesPagePermision.setCanEdit(rolesAccess.isCanEdit());
+					existingRolesPagePermision.setCanDelete(rolesAccess.isCanDelete());
+					
+					existingRolesPagePermision.setBranchCode(rolesAccess.getBranchCode());
+					
+					existingRolesPagePermision = rolesManagementService.saveRolesPagePermission(existingRolesPagePermision);
+					data.put("access", existingRolesPagePermision);
+				} else {
+					RolesPagePermision rolesPagePermision = objectMapper.convertValue(rolesAccess, RolesPagePermision.class);
+					rolesPagePermision.setId(null);
+					rolesPagePermision = rolesManagementService.saveRolesPagePermission(rolesPagePermision);
+					data.put("access", rolesPagePermision);
+				}
+			}catch (Exception e) {
+				throw new BadGatewayRequest("Permission already added");
 			}
 			
 			
@@ -189,6 +193,7 @@ public class UserAccessController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
+			
 			UserSubscription subscription = subscriptionPlanService.getSubscriptionPlanByOwnerId(userDtoReq.getOwnerId(), userDtoReq.getBranchCode());
 			if (subscription == null) {
 				throw new TaskTitleException("You have not subscribed to any plan");
@@ -196,7 +201,8 @@ public class UserAccessController {
 			UserSubscriptionDto userSubscriptionDto = objectMapper.convertValue(subscription,UserSubscriptionDto.class);
 		
 			List<User> users = userService.findUsersByOwnerIdAndBranch(SearchCriteria.builder().branchCode(userDtoReq.getBranchCode()).userId(userDtoReq.getOwnerId()).build());
-			if((users.size()) > userSubscriptionDto.getPerBranchUser()) {
+			int userExistingCount=userDtoReq.getId()==null?users.size()+1:users.size();
+			if((userExistingCount) > userSubscriptionDto.getPerBranchUser()) {
 				throw new TaskTitleException("Max number of user already has been created in this Office");
 			}
 			
@@ -207,7 +213,6 @@ public class UserAccessController {
 				throw new TaskTitleException("Mobile Number already registered with us.");
 			}
 			if (user1 == null) {
-				user.setStatus(1);
 				user.setPassword(User.PASSWORD_ENCODER.encode(user.getPassword()));
 				user.setCreated_at(new Timestamp(new Date().getTime()));
 				user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
@@ -238,8 +243,15 @@ public class UserAccessController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			List<User> users = userService.findUsers(searchCriteria);
-			data.put("userList", users);
+		
+			List<User> users = userService.findUsers(searchCriteria)
+			        .stream()
+			        .map(u -> {
+			            u.setPassword(AppUtill.generatePassword(12));
+			            return u;
+			        })
+			        .toList();
+            data.put("userList", users);
 			response.put("data", data);
 			response.put("status", "OK");
 			response.put("code", "200");

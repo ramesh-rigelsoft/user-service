@@ -57,6 +57,16 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 			                    PagePermission.TRANSACTION_VIEW
 			            ).stream().collect(java.util.stream.Collectors.joining(",")))      
 			            .SUKCount(5000)
+			            
+			            .isRepaireAllow(true)
+			            .isSalesAllow(true)
+			            .isEmployeeAllow(true)
+			            .perDayRepaireCount(10)
+			            .perDayMobileSmartDevicesSalesCount(20)
+			            .perDayComputerLaptopSalesCount(15)
+			            .perDayNormalTypeSalesCount(20)
+			            
+			            
 			            .isMultipleBranch(false)
 			            .perBranchUser(1)
 			            .isMultipleUser(true)
@@ -93,6 +103,15 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 			            .branchCount(1)
 			            .isMultipleUser(true)
 			            .userCount(1)
+			            
+			            .isRepaireAllow(true)
+			            .isSalesAllow(true)
+			            .isEmployeeAllow(true)
+			            .perDayRepaireCount(10)
+			            .perDayMobileSmartDevicesSalesCount(20)
+			            .perDayComputerLaptopSalesCount(15)
+			            .perDayNormalTypeSalesCount(20)
+			            
 			            .isReplaceItem(false)
 			            .isReturnItem(false)
 			            .isDownloadInvoice(true)
@@ -133,6 +152,16 @@ public class SubscriptionPlanServiceImpl implements ISubscriptionPlanService {
 			            .perBranchUser(1)
 			            .isMultipleUser(true)
 			            .userCount(1)
+			            
+			            .isRepaireAllow(true)
+			            .isSalesAllow(true)
+			            .isEmployeeAllow(true)
+			            .perDayRepaireCount(10)
+			            .perDayMobileSmartDevicesSalesCount(20)
+			            .perDayComputerLaptopSalesCount(15)
+			            .perDayNormalTypeSalesCount(20)
+			            
+			            
 			            .isReplaceItem(true)
 			            .isReturnItem(true)
 			            .isDownloadInvoice(true)
