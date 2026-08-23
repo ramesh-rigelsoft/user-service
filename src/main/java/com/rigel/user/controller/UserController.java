@@ -47,6 +47,7 @@ import com.rigel.user.exception.TaskTitleNotFound;
 import com.rigel.user.model.LoginDetails;
 import com.rigel.user.model.LoginRequest;
 import com.rigel.user.model.Mail;
+import com.rigel.user.model.OfficeBranch;
 import com.rigel.user.model.Roles;
 import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.User;
@@ -55,6 +56,7 @@ import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.UserSubscriptionLog;
 import com.rigel.user.model.VerifyKeyRequest;
 import com.rigel.user.model.dto.MenuDto;
+import com.rigel.user.model.dto.OfficeBranchDto;
 import com.rigel.user.model.dto.ResetPasswordRequest;
 import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.model.dto.SubscriptionPlanDto;
@@ -219,12 +221,17 @@ public class UserController {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
 			User user = userService.findUserById(searchCriteria.getUserId());
+			
 			if (user != null) {
+				String mobileNo=user.getMobile_no().split("\\|")[0];
+				String emailId=user.getEmail_id().split("\\|")[0];
+				user.setEmail_id(emailId);
+				user.setMobile_no(mobileNo);
 				data.put("user", user);
 				response.put("data", data);
 				response.put("status", "OK");
 				response.put("code", "200");
-				response.put("message", "Your OTP has been send successfully.");
+				response.put("message", "Your profile has been viewed successfully.");
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
 				throw new TaskTitleException("Mobile Number is not registered with us.");
@@ -266,8 +273,8 @@ public class UserController {
 					user.setRole("admin");
 					user.setSoftwareKey(LicenseKeyGenerator.generateLicenseKey());
 					user = userService.persistUser(user);
-					final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
-					final String token = jwtTokenUtil.generateToken(userDetails, request);
+//					final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
+//					final String token = jwtTokenUtil.generateToken(userDetails, request);
 					try {
 						if(user.getRole().equalsIgnoreCase("admin")) {
 						    emailService.sendHtmlEmail(user.getEmail_id(),user.getSoftwareKey(), user.getEmail_id(),userDtoReq.getPassword(),user.getSoftwareType());
@@ -276,10 +283,12 @@ public class UserController {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					data.put("access_token", token);
+//					data.put("access_token", token);
 					data.put("user", user);
 					response.put("data", data);
 				}else {
+					userDtoReq.setEmail_id(adminEmail);
+					userDtoReq.setMobile_no(adminMobileNo);
 					user = userService.saveUserDto(userDtoReq);
 					data.put("user", user);
 					response.put("data", data);
@@ -338,10 +347,13 @@ public class UserController {
 			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 			final String token = jwtTokenUtil.generateToken(userDetails, request);
 			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
+			OfficeBranch branch=rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(user.getOwnerId()).branchCode(user.getBranchCode()).build()).stream().findFirst().orElse(null);
+			OfficeBranchDto officeBranchDto=objectMapper.convertValue(branch, OfficeBranchDto.class);
 			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
 			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(user.getOwnerId(), login.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
 			data.put("access_token", token);
 			data.put("user", user);
+			data.put("branch", officeBranchDto);
 			data.put("page_access", menuDto);
 			data.put("subscription_plan", userSubscriptionDto);
 			response.put("data", data);

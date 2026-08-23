@@ -30,7 +30,7 @@ public class UserDetailService implements UserDetailsService {
 		User user = userDao.findUserByEmailId(username,0);
 //		System.out.println("User name >>> "+user.getId());
         if (user!= null) {
-        	return new JwtUser(user.getId(), user.getEmail_id(),
+        	return new JwtUser(user.getOwnerId(), user.getEmail_id(),
         			user.getPassword(), mapToGrantedAuthorities(user.getRole()),
         			user.getStatus(), user.getLastPasswordResetDate());
           }else {

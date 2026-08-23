@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @Builder
-@ToString
+//@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class MenuDto {

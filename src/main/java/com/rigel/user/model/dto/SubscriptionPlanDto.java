@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
+//@ToString
 public class SubscriptionPlanDto{
 
     private String subscriptionName;

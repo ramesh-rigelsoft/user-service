@@ -133,32 +133,87 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 	@Override
 	public List<OfficeBranch> searchOfficeBranch(SearchCriteria search) {
 
-		StringBuilder jpql = new StringBuilder("SELECT o FROM OfficeBranch o WHERE o.ownerId = :ownerId");
+	    StringBuilder jpql = new StringBuilder(
+	        "SELECT o FROM OfficeBranch o WHERE o.ownerId = :ownerId"
+	    );
 
-		if (search.getSearchKeyword() != null && !search.getSearchKeyword().trim().isEmpty()) {
+	    if (search.getSearchKeyword() != null && !search.getSearchKeyword().trim().isEmpty()) {
+	        jpql.append(
+	            " AND (" +
+	            "LOWER(o.branchCode) LIKE :keyword OR " +
+	            "LOWER(o.branchName) LIKE :keyword OR " +
+	            "LOWER(o.address) LIKE :keyword OR " +
+	            "LOWER(o.additionalDetails) LIKE :keyword" +
+	            ")"
+	        );
+	    }
 
-			jpql.append(" AND (" + "LOWER(o.branchCode) LIKE :keyword OR " + "LOWER(o.branchName) LIKE :keyword OR "
-					+ "LOWER(o.address) LIKE :keyword OR " + "LOWER(o.additionalDetails) LIKE :keyword" + ")");
-		}
-		if (search.getItemId() != null && !search.getItemId().isBlank()) {
-			jpql.append(" AND o.id =: id ");
-		}
+	    if (search.getBranchCode() != null && !search.getBranchCode().isBlank()) {
+	        jpql.append(" AND LOWER(o.branchCode) = :branchCode");
+	    }
 
-		TypedQuery<OfficeBranch> query = entityManager.createQuery(jpql.toString(), OfficeBranch.class);
+	    if (search.getItemId() != null && !search.getItemId().isBlank()) {
+	        jpql.append(" AND o.id = :id");
+	    }
 
-		query.setParameter("ownerId", search.getUserId());
+	    TypedQuery<OfficeBranch> query =
+	        entityManager.createQuery(jpql.toString(), OfficeBranch.class);
 
-		if (search.getSearchKeyword() != null && !search.getSearchKeyword().trim().isEmpty()) {
+	    query.setParameter("ownerId", search.getUserId());
 
-			query.setParameter("keyword", "%" + search.getSearchKeyword().toLowerCase() + "%");
-		}
-		if (search.getItemId() != null && !search.getItemId().isBlank()) {
-			query.setParameter("id", search.getItemId());
+	    if (search.getSearchKeyword() != null && !search.getSearchKeyword().trim().isEmpty()) {
+	        query.setParameter(
+	            "keyword",
+	            "%" + search.getSearchKeyword().trim().toLowerCase() + "%"
+	        );
+	    }
 
-		}
+	    if (search.getBranchCode() != null && !search.getBranchCode().isBlank()) {
+	        query.setParameter(
+	            "branchCode",
+	            search.getBranchCode().trim().toLowerCase()
+	        );
+	    }
 
-		return query.setFirstResult(0).setMaxResults(11).getResultList();
+	    if (search.getItemId() != null && !search.getItemId().isBlank()) {
+	        query.setParameter("id", search.getItemId());
+	    }
+
+	    return query.setFirstResult(0)
+	                .setMaxResults(11)
+	                .getResultList();
 	}
+
+	
+//	@Override
+//	public List<OfficeBranch> searchOfficeBranch(SearchCriteria search) {
+//
+//		StringBuilder jpql = new StringBuilder("SELECT o FROM OfficeBranch o WHERE o.ownerId = :ownerId");
+//
+//		if (search.getSearchKeyword() != null && !search.getSearchKeyword().trim().isEmpty()) {
+//
+//			jpql.append(" AND (" + "LOWER(o.branchCode) LIKE :keyword OR " + "LOWER(o.branchName) LIKE :keyword OR "
+//					+ "LOWER(o.address) LIKE :keyword OR " + "LOWER(o.additionalDetails) LIKE :keyword" + ")");
+//		}
+//		if (search.getItemId() != null && !search.getItemId().isBlank()) {
+//			jpql.append(" AND o.id =: id ");
+//		}
+//
+//		TypedQuery<OfficeBranch> query = entityManager.createQuery(jpql.toString(), OfficeBranch.class);
+//
+//		query.setParameter("ownerId", search.getUserId());
+//
+//		if (search.getSearchKeyword() != null && !search.getSearchKeyword().trim().isEmpty()) {
+//
+//			query.setParameter("keyword", "%" + search.getSearchKeyword().toLowerCase() + "%");
+//		}
+//		if (search.getItemId() != null && !search.getItemId().isBlank()) {
+//			query.setParameter("id", search.getItemId());
+//
+//		}
+//
+//		return query.setFirstResult(0).setMaxResults(11).getResultList();
+//	}
 
 	@Override
 	public OfficeBranch updateOfficeBranch(OfficeBranch officeBranch) {

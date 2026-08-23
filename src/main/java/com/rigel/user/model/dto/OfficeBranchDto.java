@@ -20,7 +20,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
+//@ToString
 public class OfficeBranchDto  {
 	
     private String id;

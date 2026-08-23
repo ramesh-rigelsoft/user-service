@@ -79,6 +79,7 @@ public class User implements Serializable{
 	private Date lastPasswordResetDate;
 	
 	private int branchCount;
+	private String branchCode;
 	private String profileLogo;
     private String softwareKey;
     private String softwareType;
