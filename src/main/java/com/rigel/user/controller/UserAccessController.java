@@ -34,6 +34,7 @@ import com.rigel.user.model.SubscriptionPlan;
 import com.rigel.user.model.User;
 import com.rigel.user.model.UserSubscription;
 import com.rigel.user.model.dto.RolesPagePermisionDto;
+import com.rigel.user.model.dto.RolesPermittedPagesList;
 import com.rigel.user.model.dto.SearchCriteria;
 import com.rigel.user.model.dto.UserDto;
 import com.rigel.user.model.dto.UserSubscriptionDto;
@@ -74,13 +75,18 @@ public class UserAccessController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			if (rolesAccess.getId() != null && rolesAccess.getId() != 0) {
+			System.out.println("rolesAccess.getId()-------------"+rolesAccess.getId());
+			if (rolesAccess.getId() != null) {
 				RolesPagePermision existingRolesPagePermision = rolesManagementService.findRolesPagePermissionById(rolesAccess.getId());
+				
 				existingRolesPagePermision.setCanAll(rolesAccess.isCanAll());
 				existingRolesPagePermision.setCanView(rolesAccess.isCanView());
 				existingRolesPagePermision.setCanCreate(rolesAccess.isCanCreate());
 				existingRolesPagePermision.setCanEdit(rolesAccess.isCanEdit());
 				existingRolesPagePermision.setCanDelete(rolesAccess.isCanDelete());
+				
+				existingRolesPagePermision.setBranchCode(rolesAccess.getBranchCode());
+				
 				existingRolesPagePermision = rolesManagementService.saveRolesPagePermission(existingRolesPagePermision);
 				data.put("access", existingRolesPagePermision);
 			} else {
@@ -89,10 +95,57 @@ public class UserAccessController {
 				rolesPagePermision = rolesManagementService.saveRolesPagePermission(rolesPagePermision);
 				data.put("access", rolesPagePermision);
 			}
+			
+			
 			response.put("data", data);
 			response.put("status", "OK");
 			response.put("code", "200");
 			response.put("message", "Your access has been updated successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
+	
+	@PostMapping(value = "fetchPremittedPagesRoleWise")
+	public ResponseEntity<Map<String, Object>> fetchPremittedPagesRoleWise(
+			@RequestBody(required = true) @Valid SearchCriteria searchCriteria, BindingResult result,
+			HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+
+		if (searchCriteria == null) {
+			throw new BadGatewayRequest("Invalid Request");
+		} else if (result.hasFieldErrors()) {
+			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+		} else {
+			List<RolesPagePermision> rolesPagePermision = rolesManagementService.fetchPermittedPagesRoleWise(searchCriteria);
+			List<RolesPermittedPagesList> rolesPermittedPagesList=rolesPagePermision.stream().map(p->RolesPermittedPagesList.builder().pageLabel(p.getPageId().getLabel()).pagePermittedId(p.getId()).build()).toList();
+			
+			data.put("pages", rolesPermittedPagesList);
+			response.put("data", data);
+			response.put("status", "OK");
+			response.put("code", "200");
+			response.put("message", "Your access has been fetch successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
+	
+	@PostMapping(value = "removedPermission")
+	public ResponseEntity<Map<String, Object>> removedPermission(
+			@RequestBody(required = true) @Valid SearchCriteria searchCriteria, BindingResult result,
+			HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+
+		if (searchCriteria == null) {
+			throw new BadGatewayRequest("Invalid Request");
+		} else if (result.hasFieldErrors()) {
+			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+		} else {
+			int rolesPagePermision = rolesManagementService.removePagesPermission(searchCriteria);
+			response.put("data", rolesPagePermision);
+			response.put("status", "OK");
+			response.put("code", "200");
+			response.put("message", "Your access has been fetch successfully.");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}

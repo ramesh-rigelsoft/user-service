@@ -317,13 +317,8 @@ public class UserController {
 		} else {
 			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 			final String token = jwtTokenUtil.generateToken(userDetails, request);
-			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
-			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
-			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(user.getOwnerId(), login.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
 			data.put("access_token", token);
 			data.put("user", user);
-			data.put("page_access", menuDto);
-			data.put("subscription_plan", userSubscriptionDto);
 			response.put("data", data);
 			response.put("status", "OK");
 			response.put("code", "200");
@@ -347,9 +342,9 @@ public class UserController {
 			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
 			final String token = jwtTokenUtil.generateToken(userDetails, request);
 			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
-			OfficeBranch branch=rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(user.getOwnerId()).branchCode(user.getBranchCode()).build()).stream().findFirst().orElse(null);
+			OfficeBranch branch=rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(user.getOwnerId()).branchCode(login.getBranchCode()).build()).stream().findFirst().orElse(null);
 			OfficeBranchDto officeBranchDto=objectMapper.convertValue(branch, OfficeBranchDto.class);
-			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId());
+			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId(),login.getBranchCode());
 			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(user.getOwnerId(), login.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
 			data.put("access_token", token);
 			data.put("user", user);

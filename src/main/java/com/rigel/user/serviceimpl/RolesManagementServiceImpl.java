@@ -50,13 +50,13 @@ public class RolesManagementServiceImpl implements IRolesManagementService {
 	}
 
 	@Override
-	public RolesPagePermision findRolesPagePermissionById(Long id) {
+	public RolesPagePermision findRolesPagePermissionById(String id) {
 		return rolesManagementDao.findRolesPagePermissionById(id);
 	}
 
 	@Override
-	public List<MenuDto> getMenus(Long roleId, Integer ownerId) {
-		return rolesManagementDao.getMenus(roleId, ownerId);
+	public List<MenuDto> getMenus(Long roleId, Integer ownerId,String branchCode) {
+		return rolesManagementDao.getMenus(roleId, ownerId,branchCode);
 	}
 
 	@Override
@@ -84,6 +84,16 @@ public class RolesManagementServiceImpl implements IRolesManagementService {
 	@Override
 	public SubscriptionPlan findBySubscriptionCode(String code) {
 		return rolesManagementDao.findBySubscriptionCode(code);
+	}
+
+	@Override
+	public List<RolesPagePermision> fetchPermittedPagesRoleWise(SearchCriteria criteria) {
+		return rolesManagementDao.fetchPermittedPagesRoleWise(criteria);
+	}
+
+	@Override
+	public int removePagesPermission(SearchCriteria criteria) {
+		return rolesManagementDao.removePagesPermission(criteria);
 	}
 
 	

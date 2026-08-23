@@ -13,13 +13,17 @@ public interface IRolesManagementService {
 
 	public RolesPagePermision saveRolesPagePermission(RolesPagePermision polesPagePermision);
 	
-	public RolesPagePermision findRolesPagePermissionById(Long id);
+	public RolesPagePermision findRolesPagePermissionById(String id);
 
 	public List<RolesPagePermision> searchRolesPagePermision(SearchCriteria criteria);
 	
+	public List<RolesPagePermision> fetchPermittedPagesRoleWise(SearchCriteria criteria);
+	
+	public int removePagesPermission(SearchCriteria criteria);
+	
 	public List<Pages> fetchPagesList(SearchCriteria criteria);
 	
-	public List<MenuDto> getMenus(Long roleId, Integer ownerId);
+	public List<MenuDto> getMenus(Long roleId, Integer ownerId,String branchCode);
 	
 	public Long getRoleIdByRole(String role);
 	

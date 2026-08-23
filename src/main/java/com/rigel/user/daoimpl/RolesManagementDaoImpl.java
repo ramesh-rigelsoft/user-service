@@ -68,11 +68,11 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 	}
 
 	@Override
-	public RolesPagePermision findRolesPagePermissionById(Long id) {
+	public RolesPagePermision findRolesPagePermissionById(String id) {
 
 		String jpql = "SELECT r FROM RolesPagePermision r WHERE r.id = :id";
 
-		return entityManager.createQuery(jpql, RolesPagePermision.class).setParameter("id", Long.valueOf(id))
+		return entityManager.createQuery(jpql, RolesPagePermision.class).setParameter("id", id)
 				.getSingleResult();
 	}
 
@@ -239,7 +239,7 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 	}
 
 	@Override
-	public List<MenuDto> getMenus(Long roleId, Integer ownerId) {
+	public List<MenuDto> getMenus(Long roleId, Integer ownerId,String branchCode) {
 
 		List<Object[]> rows;
 
@@ -268,10 +268,14 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 					JOIN rpp.pageId p
 					WHERE rpp.roleId.id = :roleId
 					  AND rpp.ownerId = :ownerId
+					  AND rpp.branchCode = :branchCode
 					  AND rpp.canView = true
 					  AND p.status = true
 					ORDER BY p.id
-					""", Object[].class).setParameter("roleId", roleId).setParameter("ownerId", ownerId)
+					""", Object[].class)
+					.setParameter("roleId", roleId)
+					.setParameter("ownerId", ownerId)
+					.setParameter("branchCode", branchCode)
 					.getResultList();
 		}
 
@@ -337,6 +341,43 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 	    } catch (Exception e) {
 	        return null;
 	    }
+	}
+
+	@Override
+	public List<RolesPagePermision> fetchPermittedPagesRoleWise(SearchCriteria criteria) {
+		String jpql = """
+			    SELECT r
+			    FROM RolesPagePermision r
+			    JOIN FETCH r.pageId p
+			    WHERE r.roleId.id = :roleId
+			    AND r.ownerId = :ownerId
+			    AND r.branchCode = :branchCode
+			""";
+
+			return entityManager
+			        .createQuery(jpql, RolesPagePermision.class)
+			        .setParameter("roleId", Long.valueOf(criteria.getRoleId()))
+			        .setParameter("ownerId", criteria.getUserId())
+			        .setParameter("branchCode", criteria.getBranchCode())
+			        .getResultList();
+	}
+
+	@Override
+	public int removePagesPermission(SearchCriteria criteria) {
+
+	    String jpql = """
+	        DELETE FROM RolesPagePermision r
+	        WHERE r.id = :id
+	          AND r.ownerId = :ownerId
+	          AND r.branchCode = :branchCode
+	    """;
+
+	    return entityManager
+	            .createQuery(jpql)
+	            .setParameter("id", criteria.getId())
+	            .setParameter("ownerId", criteria.getUserId())
+	            .setParameter("branchCode", criteria.getBranchCode())
+	            .executeUpdate();
 	}
 
 }

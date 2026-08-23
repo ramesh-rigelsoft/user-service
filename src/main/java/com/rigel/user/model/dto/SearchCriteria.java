@@ -49,6 +49,7 @@ public class SearchCriteria {
 	private String itemGen;
 	private String description;
 	private String itemId;
+	private String id;
 	private int userId;
 	private int roleId;
 	private int pageId;
