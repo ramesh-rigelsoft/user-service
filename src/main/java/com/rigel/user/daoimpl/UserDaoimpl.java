@@ -100,7 +100,6 @@ public class UserDaoimpl implements IUserDao {
 				SELECT DISTINCT u
 				FROM User u
 				WHERE LOWER(u.role) <> 'admin'
-				AND status=1
 				AND u.ownerId = :ownerId
 				""";
 

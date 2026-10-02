@@ -57,7 +57,11 @@ public class OfficeBranch implements Serializable {
 	private String gstNumber;
 	private String panNumber;
 	private String cinNumber;
-
+	
+	private String ofcLat;
+	private String ofcLng;
+	private Integer centerRedious;
+	
 	private String city;
 	private String state;
 	private String pincode;

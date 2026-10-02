@@ -358,6 +358,36 @@ public class UserController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "employeeLogin", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> employeeLogin(@RequestBody(required = true) @Valid LoginRequest login,
+			HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+		User user = userService.findUserById(login.getOwnerId());
+		if (user == null) {
+			throw new TaskTitleNotFound("Email id not existing with us.");
+		} else {
+			final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(user.getEmail_id());
+			final String token = jwtTokenUtil.generateToken(userDetails, request);
+			Long roleId=rolesManagementService.getRoleIdByRole(user.getRole());
+			OfficeBranch branch=rolesManagementService.searchOfficeBranch(SearchCriteria.builder().userId(user.getOwnerId()).branchCode(login.getBranchCode()).build()).stream().findFirst().orElse(null);
+			OfficeBranchDto officeBranchDto=objectMapper.convertValue(branch, OfficeBranchDto.class);
+			List<MenuDto> menuDto=rolesManagementService.getMenus(roleId, user.getOwnerId(),login.getBranchCode());
+			UserSubscriptionDto userSubscriptionDto = Optional.ofNullable(subscriptionPlanService.getSubscriptionPlanByOwnerId(user.getOwnerId(), login.getBranchCode())).map(e -> objectMapper.convertValue(e, UserSubscriptionDto.class)).orElse(null);
+			data.put("access_token", token);
+			data.put("user", user);
+			data.put("branch", officeBranchDto);
+			data.put("page_access", menuDto);
+			data.put("subscription_plan", userSubscriptionDto);
+			response.put("data", data);
+			response.put("status", "OK");
+			response.put("code", "200");
+			response.put("message", "Your account has been logined successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
+
 
 	@RequestMapping(value = "key/verify", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> verifyKey(

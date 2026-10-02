@@ -49,6 +49,10 @@ public class OfficeBranchDto  {
 	private String gstNumber;
 	private String panNumber;
 	private String cinNumber;
+	
+	private String ofcLat;
+	private String ofcLng;
+	private Integer centerRedious;
 
     @NotNull(message = "City Name is required")
 	private String city;

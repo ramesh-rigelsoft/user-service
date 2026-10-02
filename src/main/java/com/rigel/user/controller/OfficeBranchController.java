@@ -85,6 +85,11 @@ public class OfficeBranchController {
 				existingBranch.setState(officeBranchDto.getState());
 				existingBranch.setCity(officeBranchDto.getCity());
 				existingBranch.setPincode(officeBranchDto.getPincode());
+				if(officeBranchDto.getOfcLat()!=null) {
+					existingBranch.setOfcLat(officeBranchDto.getOfcLat());
+					existingBranch.setOfcLng(officeBranchDto.getOfcLng());
+					existingBranch.setCenterRedious(officeBranchDto.getCenterRedious());
+				}
 				
 				String fileName = UploadFileUtlity.uploadLogo(officeBranchDto.getLogo(),existingBranch.getBranchCode());
 

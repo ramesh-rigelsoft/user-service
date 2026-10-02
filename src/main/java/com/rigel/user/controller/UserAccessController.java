@@ -195,14 +195,18 @@ public class UserAccessController {
 		} else {
 			
 			UserSubscription subscription = subscriptionPlanService.getSubscriptionPlanByOwnerId(userDtoReq.getOwnerId(), userDtoReq.getBranchCode());
+			UserSubscriptionDto userSubscriptionDto = null;
+			int userCount=0;
 			if (subscription == null) {
-				throw new TaskTitleException("You have not subscribed to any plan");
+				userCount=1;//throw new TaskTitleException("You have not subscribed to any plan");
+			}else {
+				userSubscriptionDto = objectMapper.convertValue(subscription,UserSubscriptionDto.class);
+				userCount=userSubscriptionDto.getPerBranchUser();
 			}
-			UserSubscriptionDto userSubscriptionDto = objectMapper.convertValue(subscription,UserSubscriptionDto.class);
-		
+			
 			List<User> users = userService.findUsersByOwnerIdAndBranch(SearchCriteria.builder().branchCode(userDtoReq.getBranchCode()).userId(userDtoReq.getOwnerId()).build());
 			int userExistingCount=userDtoReq.getId()==null?users.size()+1:users.size();
-			if((userExistingCount) > userSubscriptionDto.getPerBranchUser()) {
+			if((userExistingCount) > userCount ) {
 				throw new TaskTitleException("Max number of user already has been created in this Office");
 			}
 			

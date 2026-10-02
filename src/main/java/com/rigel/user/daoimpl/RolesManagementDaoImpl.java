@@ -334,7 +334,7 @@ public class RolesManagementDaoImpl implements IRolesManagementDao {
 	public UserSubscription getSubscriptionPlanByOwnerId(Integer ownerId, String branchCode) {
 	    try {
 	        return entityManager
-	                .createQuery("FROM UserSubscription s WHERE s.active=true AND s.ownerId = :ownerId AND s.branchCode = :branchCode", UserSubscription.class)
+	                .createQuery("FROM UserSubscription s WHERE s.ownerId = :ownerId AND s.branchCode = :branchCode", UserSubscription.class)
 	                .setParameter("ownerId", ownerId)
 	                .setParameter("branchCode", branchCode)
 	                .getSingleResult();
