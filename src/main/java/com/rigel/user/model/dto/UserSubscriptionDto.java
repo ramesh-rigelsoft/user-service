@@ -67,6 +67,11 @@ public class UserSubscriptionDto{
     private boolean isfilterSales;
     private boolean isDownloadExcelSales;
     private boolean isDownloadExcelEntryItem;
+    
+    private boolean isRepaireAllow;
+    private boolean isSalesAllow;
+    private boolean isEmployeeAllow;
+    
     private int SUKCount;
 
       

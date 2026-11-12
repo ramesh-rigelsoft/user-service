@@ -359,7 +359,7 @@ public class UserController {
 		}
 	}
 	
-	@RequestMapping(value = "employeeLogin", method = RequestMethod.POST)
+	@RequestMapping(value = "employee-login", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> employeeLogin(@RequestBody(required = true) @Valid LoginRequest login,
 			HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
